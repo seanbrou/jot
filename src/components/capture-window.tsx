@@ -7,6 +7,10 @@ import { hideCaptureWindow } from "../lib/desktop";
 import { useOatApp } from "../hooks/use-oat-app";
 import { GoogleSignInForm } from "./google-sign-in-form";
 
+function isTauriEnvironment() {
+  return typeof window !== "undefined" && "__TAURI_INTERNALS__" in window;
+}
+
 export function CaptureWindow() {
   const {
     authReady,
@@ -29,6 +33,12 @@ export function CaptureWindow() {
   });
 
   useEffect(() => {
+    focusEditor();
+
+    if (!isTauriEnvironment()) {
+      return;
+    }
+
     const currentWindow = getCurrentWindow();
     let disposed = false;
     let removeFocusListener: (() => void) | undefined;
@@ -52,8 +62,6 @@ export function CaptureWindow() {
       removeEventListener = cleanup;
     });
 
-    focusEditor();
-
     return () => {
       disposed = true;
       removeFocusListener?.();
@@ -76,7 +84,12 @@ export function CaptureWindow() {
       setShowSuccess(true);
       setTimeout(async () => {
         setShowSuccess(false);
-        await hideCaptureWindow();
+        if (isTauriEnvironment()) {
+          await hideCaptureWindow();
+          return;
+        }
+
+        window.close();
       }, 400);
     } catch {
       // error is surfaced via useOatApp
@@ -141,7 +154,11 @@ export function CaptureWindow() {
               }
               if (e.key === "Escape") {
                 e.preventDefault();
-                void hideCaptureWindow();
+                if (isTauriEnvironment()) {
+                  void hideCaptureWindow();
+                } else {
+                  window.close();
+                }
               }
             }}
             placeholder="Jot something down…"
@@ -174,12 +191,14 @@ export function CaptureWindow() {
         transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
         className="relative flex w-full items-stretch overflow-hidden rounded-2xl bg-surface"
       >
-        <div
-          data-tauri-drag-region
-          className="flex w-7 shrink-0 cursor-grab items-center justify-center rounded-l-2xl bg-surface-container-high/60 active:cursor-grabbing"
-        >
-          <GripVertical className="h-3.5 w-3.5 text-outline/50 pointer-events-none" />
-        </div>
+        {isTauriEnvironment() ? (
+          <div
+            data-tauri-drag-region
+            className="flex w-7 shrink-0 cursor-grab items-center justify-center rounded-l-2xl bg-surface-container-high/60 active:cursor-grabbing"
+          >
+            <GripVertical className="h-3.5 w-3.5 text-outline/50 pointer-events-none" />
+          </div>
+        ) : null}
 
         <div className="relative min-w-0 flex-1">
           <AnimatePresence>

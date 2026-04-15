@@ -34,6 +34,14 @@ const EMPTY_NOTE_DIALOG: NoteDialogState = {
   useAiRouting: true,
 };
 
+const BOARD_HEADLINES = [
+  "What's up, {name}?",
+  "What are we tracking, {name}?",
+  "What's moving today, {name}?",
+  "Where's your head at, {name}?",
+  "What matters right now, {name}?",
+];
+
 export function MainWindow() {
   const {
     activeView,
@@ -69,6 +77,12 @@ export function MainWindow() {
   const [noteDialog, setNoteDialog] = useState<NoteDialogState>(EMPTY_NOTE_DIALOG);
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget>(null);
   const [loadingNoteDetail, setLoadingNoteDetail] = useState(false);
+  const viewerName = snapshot.viewer?.name?.trim() || "Sean";
+  const boardHeadline =
+    BOARD_HEADLINES[viewerName.length % BOARD_HEADLINES.length].replace(
+      "{name}",
+      viewerName.split(/\s+/)[0] || "Sean",
+    );
 
   function openCreateNotebook() {
     if (!isAuthenticated) {
@@ -316,14 +330,14 @@ export function MainWindow() {
 
         <main className="z-0 flex-1 min-h-0 overflow-x-auto overflow-y-hidden overscroll-x-contain p-5">
           <div className="mb-5 flex items-end justify-between">
-            <div>
-              <h2 className="font-headline text-xl font-bold tracking-tight text-[#2d2a27]">
-                Functional Boards
-              </h2>
-              <p className="mt-0.5 text-[13px] text-[#8c857f]">
-                Strategic intelligence and task categorization
-              </p>
-            </div>
+              <div>
+                <h2 className="font-headline text-xl font-bold tracking-tight text-[#2d2a27]">
+                  {boardHeadline}
+                </h2>
+                <p className="mt-0.5 text-[13px] text-[#8c857f]">
+                  Notes, nudges, and loose ends with AI keeping the titles tight.
+                </p>
+              </div>
             <div className="flex rounded-full bg-[#f3efeb]/80 p-0.5">
               {boardButtons.map((button) => (
                 <button
@@ -362,6 +376,20 @@ export function MainWindow() {
               onMoveNote={handleMoveNote}
               onTogglePinned={(note) => void togglePinned(note.id, !note.pinned)}
               onToggleArchived={(note) => void setNoteArchived(note.id, !note.archived)}
+              onDeleteNote={(note) =>
+                setDeleteTarget({
+                  type: "note",
+                  id: note.id,
+                  label: note.suggestedTitle || note.title,
+                })
+              }
+              onDeleteNotebook={(notebook) =>
+                setDeleteTarget({
+                  type: "notebook",
+                  id: notebook.id,
+                  label: notebook.name,
+                })
+              }
             />
           )}
         </main>

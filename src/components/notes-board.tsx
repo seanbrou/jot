@@ -22,7 +22,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { Archive, MoreHorizontal, Pin, Plus } from "lucide-react";
+import { Archive, MoreHorizontal, Pin, Plus, Trash2 } from "lucide-react";
 import { INBOX_NOTEBOOK_ID, STATUS_LABELS } from "../lib/constants";
 import type { BoardView, Notebook, Note } from "../lib/types";
 
@@ -35,7 +35,8 @@ type ColumnDefinition = {
   dimmed?: boolean;
   canAdd?: boolean;
   onAdd?: () => void;
-  onMenu?: () => void;
+  onEdit?: () => void;
+  onDelete?: () => void;
 };
 
 function formatRelativeTime(value: string) {
@@ -151,6 +152,7 @@ function Column({
   isDragActive: boolean;
 }) {
   const { isOver, setNodeRef } = useDroppable({ id: column.id });
+  const [menuOpen, setMenuOpen] = useState(false);
 
   return (
     <div
@@ -173,14 +175,45 @@ function Column({
             {column.count}
           </span>
         </div>
-        <button
-          type="button"
-          className="cursor-pointer text-[#b5aea8] hover:text-[#2d2a27]"
-          onClick={column.onMenu}
-          disabled={!column.onMenu}
-        >
-          <MoreHorizontal className="h-4 w-4" />
-        </button>
+        {column.onEdit || column.onDelete ? (
+          <div className="relative">
+            <button
+              type="button"
+              className="cursor-pointer text-[#b5aea8] hover:text-[#2d2a27]"
+              onClick={() => setMenuOpen((open) => !open)}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+            </button>
+            {menuOpen ? (
+              <div className="absolute right-0 top-7 z-20 min-w-36 rounded-2xl border border-[#ece4dc] bg-white p-1.5 shadow-[0_18px_48px_rgba(45,42,39,0.10)]">
+                {column.onEdit ? (
+                  <button
+                    type="button"
+                    className="flex w-full items-center rounded-xl px-3 py-2 text-left text-sm text-[#6b6560] transition hover:bg-[#f7f4f0] hover:text-[#2d2a27]"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      column.onEdit?.();
+                    }}
+                  >
+                    Edit notebook
+                  </button>
+                ) : null}
+                {column.onDelete ? (
+                  <button
+                    type="button"
+                    className="flex w-full items-center rounded-xl px-3 py-2 text-left text-sm text-[#a1421a] transition hover:bg-[#fff3ee]"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      column.onDelete?.();
+                    }}
+                  >
+                    Delete notebook
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
       </div>
       <div className="custom-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-y-contain pr-1">
         {children}
@@ -207,12 +240,14 @@ function BoardNoteCardBody({
   headerActions,
   onArchiveToggle,
   onPinnedToggle,
+  onDelete,
 }: {
   note: Note;
   dragStripActive: boolean;
   headerActions: "interactive" | "overlay";
   onArchiveToggle?: (note: Note) => void;
   onPinnedToggle?: (note: Note) => void;
+  onDelete?: (note: Note) => void;
 }) {
   const pinArchive = (
     <div className="flex items-center gap-1">
@@ -241,6 +276,16 @@ function BoardNoteCardBody({
           >
             <Archive className="h-3.5 w-3.5" />
           </button>
+          <button
+            type="button"
+            className="rounded-full p-1.5 text-[#b85c34] transition hover:bg-[#fff1ea] hover:text-[#8a3d18]"
+            onClick={(event) => {
+              event.stopPropagation();
+              onDelete?.(note);
+            }}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
         </>
       ) : (
         <>
@@ -255,6 +300,9 @@ function BoardNoteCardBody({
           </span>
           <span className="inline-flex rounded-full p-1.5 text-[#b5aea8]" aria-hidden>
             <Archive className="h-3.5 w-3.5" />
+          </span>
+          <span className="inline-flex rounded-full p-1.5 text-[#b85c34]" aria-hidden>
+            <Trash2 className="h-3.5 w-3.5" />
           </span>
         </>
       )}
@@ -292,11 +340,13 @@ function SortableNoteCard({
   onOpen,
   onArchiveToggle,
   onPinnedToggle,
+  onDelete,
 }: {
   note: Note;
   onOpen: (note: Note) => void;
   onArchiveToggle: (note: Note) => void;
   onPinnedToggle: (note: Note) => void;
+  onDelete: (note: Note) => void;
 }) {
   const dragJustEndedRef = useRef(false);
   const {
@@ -347,6 +397,7 @@ function SortableNoteCard({
         headerActions="interactive"
         onArchiveToggle={onArchiveToggle}
         onPinnedToggle={onPinnedToggle}
+        onDelete={onDelete}
       />
     </div>
   );
@@ -416,6 +467,7 @@ function buildColumns(
   archivedNotes: Note[],
   openCreateNote: (notebookId: string | null) => void,
   openNotebookEditor: (notebook: Notebook) => void,
+  deleteNotebook: (notebook: Notebook) => void,
 ): ColumnDefinition[] {
   const notesByNotebookId = new Map<string | null, Note[]>();
   notesByNotebookId.set(null, []);
@@ -449,7 +501,8 @@ function buildColumns(
       notes: notesByNotebookId.get(notebook.id) ?? [],
       canAdd: true,
       onAdd: () => openCreateNote(notebook.id),
-      onMenu: () => openNotebookEditor(notebook),
+      onEdit: () => openNotebookEditor(notebook),
+      onDelete: () => deleteNotebook(notebook),
     })),
     {
       id: "archive",
@@ -473,6 +526,8 @@ export function NotesBoard({
   onMoveNote,
   onTogglePinned,
   onToggleArchived,
+  onDeleteNote,
+  onDeleteNotebook,
 }: {
   activeView: BoardView;
   notebooks: Notebook[];
@@ -484,6 +539,8 @@ export function NotesBoard({
   onMoveNote: (noteId: string, columnId: string | null) => Promise<void>;
   onTogglePinned: (note: Note) => void;
   onToggleArchived: (note: Note) => void;
+  onDeleteNote: (note: Note) => void;
+  onDeleteNotebook: (notebook: Notebook) => void;
 }) {
   const [activeDragId, setActiveDragId] = useState<string | null>(null);
   const [localNotes, setLocalNotes] = useState<Note[]>(() => [...activeNotes, ...archivedNotes]);
@@ -520,8 +577,15 @@ export function NotesBoard({
   const columns = useMemo(() => {
     const active = localNotes.filter((n) => !n.archived);
     const archived = localNotes.filter((n) => n.archived);
-    return buildColumns(notebooks, active, archived, onCreateNote, onEditNotebook);
-  }, [localNotes, notebooks, onCreateNote, onEditNotebook]);
+    return buildColumns(
+      notebooks,
+      active,
+      archived,
+      onCreateNote,
+      onEditNotebook,
+      onDeleteNotebook,
+    );
+  }, [localNotes, notebooks, onCreateNote, onDeleteNotebook, onEditNotebook]);
 
   const notesById = useMemo(
     () => new Map(localNotes.map((note) => [note.id, note])),
@@ -648,6 +712,7 @@ export function NotesBoard({
               onOpen={onOpenNote}
               onArchiveToggle={onToggleArchived}
               onPinnedToggle={onTogglePinned}
+              onDelete={onDeleteNote}
             />
           ))}
         </Column>
@@ -681,6 +746,7 @@ export function NotesBoard({
                     onOpen={onOpenNote}
                     onArchiveToggle={onToggleArchived}
                     onPinnedToggle={onTogglePinned}
+                    onDelete={onDeleteNote}
                   />
                 ))}
               </Column>

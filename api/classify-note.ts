@@ -13,7 +13,7 @@ const classificationSchema = z.object({
   notebookId: z.string().nullable(),
   confidence: z.number().min(0).max(1),
   reasoning: z.string().min(1),
-  suggestedTitle: z.string().min(1).optional(),
+  title: z.string().min(1),
 });
 
 export default async function handler(request: Request) {
@@ -46,7 +46,7 @@ Rules:
 - Only choose notebook ids from the provided list.
 - If no notebook is a clear fit, return notebookId as null.
 - Confidence must be between 0 and 1.
-- Suggested titles should be short, useful, and natural.
+- Return a short natural title that summarizes the note in 3 to 8 words.
 - Reasoning should be one sentence and refer to the chosen notebook or explain why Inbox is safer.`,
       prompt: `Note body:
 ${requestBody.body}

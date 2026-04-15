@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Oat Quick Capture Options</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <div class="card">
+        <div class="eyebrow">Oat Quick Capture</div>
+        <h1>Extension settings</h1>
+        <p class="copy">
+          Point the extension at your local or deployed Oat web app. The extension will open
+          <code>?capture=1</code> in a small popup window.
+        </p>
+
+        <label for="app-url">Oat app URL</label>
+        <input id="app-url" type="url" placeholder="http://localhost:5173" />
+
+        <div class="actions">
+          <button id="save" type="button">Save</button>
+          <span id="status" role="status" aria-live="polite"></span>
+        </div>
+
+        <p class="hint">
+          Example values: <code>http://localhost:5173</code> during dev or your deployed site URL.
+        </p>
+      </div>
+    </main>
+    <script type="module" src="options.js"></script>
+  </body>
+</html>

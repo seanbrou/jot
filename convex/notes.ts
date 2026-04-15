@@ -12,18 +12,25 @@ import { z } from "zod";
 import {
   requireAuthUser,
   summarizeTitle,
+  normalizeGeneratedTitle,
   buildSearchText,
   sortNotes,
   buildBodyPreview,
 } from "./lib";
 
 const classifierModel = process.env.OAT_CLASSIFIER_MODEL ?? "google/gemini-2.5-flash-lite";
+const titleModel =
+  process.env.OAT_NOTE_TITLE_MODEL ?? "google/gemini-3.1-flash-lite-preview";
 
 const classificationSchema = z.object({
   notebookId: z.string().nullable(),
   confidence: z.number().min(0).max(1),
   reasoning: z.string().min(1),
-  suggestedTitle: z.string().min(1).optional(),
+  title: z.string().min(1),
+});
+
+const titleSchema = z.object({
+  title: z.string().min(1),
 });
 
 const classifyNoteInternalRef = makeFunctionReference<"action">("notes:classifyNoteInternal");
@@ -40,6 +47,9 @@ const updateNoteForReclassificationRef = makeFunctionReference<"mutation">(
 const prepareNoteReclassificationRef = makeFunctionReference<"mutation">(
   "notes:prepareNoteReclassification",
 );
+const getNoteForTitleRef = makeFunctionReference<"query">("notes:getNoteForTitle");
+const applyGeneratedTitleRef = makeFunctionReference<"mutation">("notes:applyGeneratedTitle");
+const generateTitleInternalRef = makeFunctionReference<"action">("notes:generateTitleInternal");
 
 const viewValidator = v.union(v.literal("board"), v.literal("timeline"), v.literal("archive"));
 
@@ -177,7 +187,7 @@ async function runClassificationForNote(ctx: any, noteId: any) {
       confidence: 0,
       model: "system/inbox",
       reasoning: "No notebooks exist yet, so the note stayed in Inbox.",
-      suggestedTitle: document.title,
+      title: document.title,
     });
   }
 
@@ -191,7 +201,7 @@ async function runClassificationForNote(ctx: any, noteId: any) {
       confidence: 0.98,
       model: "system/exact-match",
       reasoning: `The note explicitly mentioned ${exactMatch.name}.`,
-      suggestedTitle: document.title,
+      title: document.title,
     });
   }
 
@@ -222,7 +232,7 @@ Rules:
 - Only return notebook ids from the candidate list.
 - Return notebookId as null if none clearly fit.
 - Keep reasoning to one short sentence.
-- Suggested titles should be short and natural.`,
+- Return a short natural title that summarizes the note in 3 to 8 words.`,
       prompt: `Note:
 ${document.body}
 
@@ -251,7 +261,7 @@ ${candidateNotebooks
       confidence: normalized.confidence,
       model: classifierModel,
       reasoning: normalized.reasoning,
-      suggestedTitle: normalized.suggestedTitle ?? document.title,
+      title: normalized.title,
     });
   } catch (error) {
     const reason =
@@ -262,6 +272,51 @@ ${candidateNotebooks
       expectedUpdatedAt: document.updatedAt,
       reason,
     });
+  }
+}
+
+async function runTitleGenerationForNote(ctx: any, noteId: any) {
+  const document = await ctx.runQuery(getNoteForTitleRef, { noteId });
+
+  if (!document || document.archived) {
+    return null;
+  }
+
+  try {
+    const result = await generateObject({
+      model: gateway(titleModel),
+      temperature: 0,
+      providerOptions: {
+        gateway: {
+          user: document.authUserId,
+          tags: ["app:oat", "feature:note-title-generation"],
+        },
+        google: {
+          thinkingConfig: {
+            thinkingBudget: 0,
+          },
+        },
+      },
+      system: `Write a concise title for a personal note.
+
+Rules:
+- 3 to 8 words.
+- No quotes, emojis, or ending punctuation.
+- Make it specific and useful, not generic.`,
+      prompt: `Note body:
+${document.body}`,
+      schema: titleSchema,
+    });
+
+    const normalized = titleSchema.parse(result.object);
+
+    return await ctx.runMutation(applyGeneratedTitleRef, {
+      noteId,
+      expectedUpdatedAt: document.updatedAt,
+      title: normalizeGeneratedTitle(normalized.title, document.body),
+    });
+  } catch {
+    return null;
   }
 }
 
@@ -388,6 +443,8 @@ export const create = mutationGeneric({
 
     if (!manualNotebookId) {
       await ctx.scheduler.runAfter(0, classifyNoteInternalRef, { noteId: id });
+    } else {
+      await ctx.scheduler.runAfter(0, generateTitleInternalRef, { noteId: id });
     }
 
     return await ctx.db.get(id);
@@ -497,6 +554,8 @@ export const update = mutationGeneric({
 
     if (args.reclassify) {
       await ctx.scheduler.runAfter(0, classifyNoteInternalRef, { noteId: args.noteId });
+    } else {
+      await ctx.scheduler.runAfter(0, generateTitleInternalRef, { noteId: args.noteId });
     }
 
     return await ctx.db.get(args.noteId);
@@ -735,7 +794,7 @@ export const applyClassificationResult = internalMutationGeneric({
     confidence: v.number(),
     reasoning: v.string(),
     model: v.string(),
-    suggestedTitle: v.optional(v.union(v.string(), v.null())),
+    title: v.string(),
   },
   handler: async (ctx, args) => {
     const note = await ctx.db.get(args.noteId);
@@ -747,15 +806,15 @@ export const applyClassificationResult = internalMutationGeneric({
       return note;
     }
 
-    const title = note.title;
-    const suggestedTitle = args.suggestedTitle ?? null;
+    const title = normalizeGeneratedTitle(args.title, note.body);
 
     await ctx.db.patch(args.noteId, {
+      title,
       notebookId: args.notebookId,
       aiStatus: args.notebookId ? "sorted" : "review",
       aiConfidence: args.confidence,
-      suggestedTitle,
-      searchText: buildSearchText(title, note.body, suggestedTitle, args.notebookName ?? null),
+      suggestedTitle: title,
+      searchText: buildSearchText(title, note.body, title, args.notebookName ?? null),
       updatedAt: Date.now(),
     });
 
@@ -819,6 +878,15 @@ export const classifyNoteInternal = actionGeneric({
   },
 });
 
+export const generateTitleInternal = actionGeneric({
+  args: {
+    noteId: v.id("notes"),
+  },
+  handler: async (ctx, args) => {
+    return await runTitleGenerationForNote(ctx, args.noteId);
+  },
+});
+
 export const getNoteForClassification = queryGeneric({
   args: {
     noteId: v.id("notes"),
@@ -850,6 +918,57 @@ export const getNoteForClassification = queryGeneric({
         description: entry.description,
       })),
     };
+  },
+});
+
+export const getNoteForTitle = queryGeneric({
+  args: {
+    noteId: v.id("notes"),
+  },
+  handler: async (ctx, args) => {
+    const note = await ctx.db.get(args.noteId);
+    if (!note) {
+      return null;
+    }
+
+    const notebook = note.notebookId ? await ctx.db.get(note.notebookId) : null;
+
+    return {
+      id: note._id,
+      authUserId: note.authUserId,
+      body: note.body,
+      archived: note.archived,
+      notebookName: notebook?.name ?? null,
+      updatedAt: note.updatedAt,
+    };
+  },
+});
+
+export const applyGeneratedTitle = internalMutationGeneric({
+  args: {
+    noteId: v.id("notes"),
+    expectedUpdatedAt: v.number(),
+    title: v.string(),
+  },
+  handler: async (ctx, args) => {
+    const note = await ctx.db.get(args.noteId);
+    if (!note || note.archived || note.updatedAt !== args.expectedUpdatedAt) {
+      return note;
+    }
+
+    await ctx.db.patch(args.noteId, {
+      title: args.title,
+      suggestedTitle: args.title,
+      searchText: buildSearchText(
+        args.title,
+        note.body,
+        args.title,
+        note.notebookId ? (await ctx.db.get(note.notebookId))?.name ?? null : null,
+      ),
+      updatedAt: Date.now(),
+    });
+
+    return await ctx.db.get(args.noteId);
   },
 });
 

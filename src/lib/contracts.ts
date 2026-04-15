@@ -16,7 +16,7 @@ export const classifyNoteResponseSchema = z.object({
   notebookId: z.string().nullable(),
   confidence: z.number().min(0).max(1),
   reasoning: z.string().min(1),
-  suggestedTitle: z.string().min(1).optional(),
+  title: z.string().min(1),
 });
 
 export type ClassifyNoteRequest = z.infer<typeof classifyNoteRequestSchema>;

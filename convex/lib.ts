@@ -22,6 +22,19 @@ export function summarizeTitle(body: string, fallback = "Untitled note") {
   return firstLine.length > 72 ? `${firstLine.slice(0, 69)}...` : firstLine;
 }
 
+export function normalizeGeneratedTitle(title: string, fallbackBody: string) {
+  const normalized = title
+    .replace(/^["'\s]+|["'\s]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim();
+
+  if (!normalized) {
+    return summarizeTitle(fallbackBody);
+  }
+
+  return normalized.length > 72 ? `${normalized.slice(0, 69)}...` : normalized;
+}
+
 export function buildSearchText(
   title: string,
   body: string,
