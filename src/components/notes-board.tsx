@@ -158,17 +158,18 @@ function Column({
     <div
       ref={setNodeRef}
       className={clsx(
-        "flex h-full min-h-0 w-72 flex-col rounded-2xl p-2 transition-all duration-200 -m-2",
+        "flex h-full min-h-0 w-72 flex-col rounded-2xl transition-all duration-200",
         column.dimmed && !isOver && "opacity-50 hover:opacity-100",
         isDragActive && !isOver && "opacity-80",
         isOver &&
-        "bg-[#b35c2a]/[0.04] ring-2 ring-[#b35c2a]/20 ring-offset-2 ring-offset-transparent",
+        "bg-[#b35c2a]/[0.04] ring-2 ring-[#b35c2a]/20",
       )}
     >
-      <div className="mb-3 flex items-center justify-between px-1">
+      {/* Header */}
+      <div className="flex items-center justify-between px-2 pt-2 pb-2">
         <div className="flex items-center gap-2">
           <span className={clsx("h-2 w-2 rounded-full", column.dotColor, isOver && "!bg-[#b35c2a]")} />
-          <h3 className="font-headline text-[11px] font-semibold uppercase tracking-widest text-[#2d2a27]">
+          <h3 className="text-[13px] font-bold uppercase tracking-[0.08em] text-[#2d2a27]">
             {column.title}
           </h3>
           <span className="rounded-full bg-[#ede8e3] px-1.5 py-0.5 text-[10px] font-semibold text-[#8c857f]">
@@ -215,17 +216,18 @@ function Column({
           </div>
         ) : null}
       </div>
-      <div className="custom-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-y-contain pr-1">
+      {/* Cards */}
+      <div className="custom-scrollbar flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto overscroll-y-contain px-2 pb-2">
         {children}
         {column.canAdd ? (
           <button
             type="button"
             onClick={column.onAdd}
-            className="cursor-pointer rounded-xl border border-dashed border-[#d4cec8] p-3.5 text-[#b5aea8] transition-all hover:border-[#b35c2a] hover:text-[#b35c2a]"
+            className="cursor-pointer rounded-xl border border-dashed border-[#d4cec8] p-3 text-[#b5aea8] transition-all hover:border-[#b35c2a] hover:text-[#b35c2a]"
           >
             <div className="flex items-center justify-center gap-2">
               <Plus className="h-4 w-4" />
-              <span className="text-xs font-semibold uppercase tracking-widest">Add Item</span>
+              <span className="text-xs font-semibold">Add note</span>
             </div>
           </button>
         ) : null}
@@ -428,34 +430,107 @@ function TimelineView({
 }) {
   if (notes.length === 0) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-[#d4cec8] bg-white p-10 text-center text-sm text-[#8c857f]">
-        No notes matched this view yet.
+      <div className="flex h-[calc(100vh-14rem)] items-center justify-center text-sm text-[#8c857f]">
+        No notes yet. Create one to get started.
       </div>
     );
   }
 
+  // Group by date
+  const grouped = new Map<string, Note[]>();
+  for (const note of notes) {
+    const date = new Date(note.updatedAt);
+    const key = date.toLocaleDateString("en-US", {
+      weekday: "long",
+      month: "long",
+      day: "numeric",
+    });
+    if (!grouped.has(key)) grouped.set(key, []);
+    grouped.get(key)!.push(note);
+  }
+
   return (
-    <div className="custom-scrollbar flex h-[calc(100vh-10rem)] flex-col gap-3 overflow-y-auto overscroll-y-contain pr-2">
-      {notes.map((note) => (
-        <button
-          key={note.id}
-          type="button"
-          className="rounded-[1.4rem] border border-[#e8e2dc] bg-white p-5 text-left shadow-sm transition hover:border-[#d4cec8]"
-          onClick={() => onOpen(note)}
-        >
-          <div className="flex items-start justify-between gap-6">
-            <div className="min-w-0">
-              <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#8c857f]">
-                {formatRelativeTime(note.updatedAt)}
-              </div>
-              <div className="text-lg font-semibold text-[#2d2a27]">
-                {note.suggestedTitle || note.title}
-              </div>
-              <div className="mt-2 line-clamp-3 text-sm leading-7 text-[#6b6560]">{note.body}</div>
+    <div className="custom-scrollbar flex h-[calc(100vh-14rem)] flex-col overflow-y-auto overscroll-y-contain pr-1">
+      {Array.from(grouped.entries()).map(([dateLabel, dayNotes], groupIdx) => (
+        <div key={dateLabel} className={clsx(groupIdx > 0 && "mt-8")}>
+          {/* Date header */}
+          <div className="sticky top-0 z-10 mb-4 bg-[#faf7f5] pb-2 pt-1">
+            <div className="flex items-center gap-3">
+              <span className="text-[13px] font-semibold text-[#2d2a27]">
+                {dateLabel}
+              </span>
+              <span className="h-px flex-1 bg-[#ece4dc]" />
+              <span className="text-[11px] font-medium text-[#b5aea8]">
+                {dayNotes.length} {dayNotes.length === 1 ? "note" : "notes"}
+              </span>
             </div>
-            <StatusBadge note={note} />
           </div>
-        </button>
+
+          {/* Notes list */}
+          <div className="flex flex-col">
+            {dayNotes.map((note, idx) => {
+              const statusLabel = STATUS_LABELS[note.aiStatus];
+              const time = new Date(note.updatedAt).toLocaleTimeString("en-US", {
+                hour: "numeric",
+                minute: "2-digit",
+              });
+              return (
+                <button
+                  key={note.id}
+                  type="button"
+                  className={clsx(
+                    "group flex items-start gap-4 py-3 text-left transition-colors hover:bg-[#f7f4f0]/60 rounded-lg px-3 -mx-3",
+                    idx < dayNotes.length - 1 && "border-b border-[#ece4dc]/50",
+                  )}
+                  onClick={() => onOpen(note)}
+                >
+                  {/* Time + status column */}
+                  <div className="flex w-20 shrink-0 flex-col items-end gap-1 pt-0.5">
+                    <span className="text-[12px] font-medium text-[#8c857f] tabular-nums">
+                      {time}
+                    </span>
+                    <span
+                      className={clsx(
+                        "rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em]",
+                        note.archived
+                          ? "bg-[#f3efeb] text-[#8c857f]"
+                          : note.aiStatus === "sorted"
+                          ? "bg-[#b35c2a]/10 text-[#b35c2a]"
+                          : note.aiStatus === "pending"
+                          ? "bg-[#f3efeb] text-[#8c857f]"
+                          : note.aiStatus === "review"
+                          ? "bg-[#efe6da] text-[#7a5c40]"
+                          : "bg-[#ffdad6] text-[#93000a]",
+                      )}
+                    >
+                      {note.archived ? "Archived" : statusLabel}
+                    </span>
+                  </div>
+
+                  {/* Content column */}
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-semibold leading-snug text-[#2d2a27] group-hover:text-[#b35c2a] transition-colors">
+                      {note.suggestedTitle || note.title}
+                    </div>
+                    <div className="mt-0.5 line-clamp-2 text-[12px] leading-5 text-[#8c857f]">
+                      {note.body}
+                    </div>
+                    <div className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.06em] text-[#b5aea8]">
+                      {note.source.replace(/-/g, " ")}
+                    </div>
+                  </div>
+
+                  {/* Arrow indicator */}
+                  <div className="mt-1 shrink-0 text-[#d4cec8] opacity-0 transition-opacity group-hover:opacity-100">
+                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
       ))}
     </div>
   );

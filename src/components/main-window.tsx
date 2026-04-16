@@ -194,20 +194,53 @@ export function MainWindow() {
       {/* ── Sidebar ── */}
       <aside
         className={clsx(
-          "flex flex-col border-r border-[#e8e2dc] bg-white transition-all duration-200",
+          "relative flex flex-col border-r border-[#e8e2dc] bg-white transition-all duration-200",
           sidebarCollapsed ? "w-[52px]" : "w-[220px]",
         )}
       >
-        {/* Logo */}
-        <div className="flex h-14 items-center border-b border-[#f0ece8] px-4">
-          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#b35c2a] text-[11px] font-bold text-white">
-            J
-          </div>
-          {!sidebarCollapsed && (
-            <span className="ml-3 text-[15px] font-bold tracking-tight text-[#2d2a27]">
-              Jot
-            </span>
+        {/* Collapse toggle pill — top-right edge */}
+        <button
+          type="button"
+          className={clsx(
+            "absolute -right-3 top-3 z-30 flex h-6 w-6 items-center justify-center rounded-full border border-[#e8e2dc] bg-white text-[#8c857f] shadow-sm transition-all hover:border-[#b35c2a] hover:text-[#b35c2a]",
+            sidebarCollapsed && "left-1/2 -ml-3 -right-auto top-2",
           )}
+          onClick={() => setSidebarCollapsed((v) => !v)}
+        >
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            {sidebarCollapsed
+              ? <path d="M9 18l6-6-6-6" />
+              : <path d="M15 18l-6-6 6-6" />}
+          </svg>
+        </button>
+
+        {/* Click outside edge to collapse (when expanded) */}
+        {!sidebarCollapsed && (
+          <div
+            className="absolute -right-2 top-0 z-20 h-full w-4 cursor-col-resize"
+            onClick={() => setSidebarCollapsed(true)}
+          />
+        )}
+        {/* Click right edge to expand (when collapsed) */}
+        {sidebarCollapsed && (
+          <div
+            className="absolute inset-y-0 -right-1 z-20 w-3 cursor-col-resize rounded-r-md transition-colors hover:bg-[#f7f4f0]"
+            onClick={() => setSidebarCollapsed(false)}
+          />
+        )}
+
+        {/* Logo */}
+        <div className="flex h-14 items-center border-b border-[#f0ece8] px-3">
+          <div className="flex items-center gap-2.5">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[#b35c2a] text-[11px] font-bold text-white">
+              J
+            </div>
+            {!sidebarCollapsed && (
+              <span className="text-[15px] font-bold tracking-tight text-[#2d2a27]">
+                Jot
+              </span>
+            )}
+          </div>
         </div>
 
         {/* Nav */}
@@ -273,19 +306,6 @@ export function MainWindow() {
             )}
           </button>
         </div>
-
-        {/* Collapse toggle */}
-        <button
-          type="button"
-          className="hidden h-8 items-center justify-center text-[#8c857f] transition-colors hover:text-[#2d2a27] md:flex"
-          onClick={() => setSidebarCollapsed((v) => !v)}
-        >
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            {sidebarCollapsed
-              ? <path d="M9 18l6-6-6-6" />
-              : <path d="M15 18l-6-6 6-6" />}
-          </svg>
-        </button>
       </aside>
 
       {/* ── Main area ── */}
@@ -319,19 +339,41 @@ export function MainWindow() {
 
         {/* Board content */}
         <main className="flex-1 overflow-x-auto overflow-y-hidden p-5">
-          {/* Board header */}
-          <div className="mb-4 flex items-center justify-between">
-            <div>
+          {/* Board header — only show on board view */}
+          {activeView === "board" && (
+            <div className="mb-4 flex items-center justify-between">
+              <div>
+                <h2 className="text-lg font-semibold tracking-tight text-[#2d2a27]">
+                  Good to see you, {firstName}
+                </h2>
+                <p className="mt-0.5 text-[13px] text-[#8c857f]">
+                  Drag notes between columns to organize.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {activeView === "timeline" && (
+            <div className="mb-4">
               <h2 className="text-lg font-semibold tracking-tight text-[#2d2a27]">
-                Good to see you, {firstName}
+                Timeline
               </h2>
               <p className="mt-0.5 text-[13px] text-[#8c857f]">
-                {activeView === "board" && "Drag notes between columns to organize."}
-                {activeView === "timeline" && "Chronological view of all your notes."}
-                {activeView === "archive" && "Archived notes you can restore anytime."}
+                All your notes, organized by day.
               </p>
             </div>
-          </div>
+          )}
+
+          {activeView === "archive" && (
+            <div className="mb-4">
+              <h2 className="text-lg font-semibold tracking-tight text-[#2d2a27]">
+                Archive
+              </h2>
+              <p className="mt-0.5 text-[13px] text-[#8c857f]">
+                Archived notes you can restore anytime.
+              </p>
+            </div>
+          )}
 
           {!authReady || loading ? (
             <div className="flex h-[calc(100vh-10rem)] items-center justify-center text-[#8c857f]">

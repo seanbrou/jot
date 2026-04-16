@@ -1,76 +1,18 @@
 import { useMemo } from "react";
 import clsx from "clsx";
-import { Loader2 } from "lucide-react";
+import { Check, Loader2, Trash2 } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "./ui/dialog";
 import { Input } from "./ui/input";
-import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { NOTEBOOK_COLORS } from "../lib/constants";
 import type { Notebook, NotebookDraft } from "../lib/types";
-
-function NotebookColorPicker({
-  value,
-  onChange,
-}: {
-  value: string;
-  onChange: (value: string) => void;
-}) {
-  return (
-    <div className="flex flex-wrap gap-2">
-      {NOTEBOOK_COLORS.map((color) => (
-        <button
-          key={color}
-          type="button"
-          className={clsx(
-            "h-9 w-9 rounded-full border-2 transition",
-            value === color ? "border-[#2d2a27] scale-105" : "border-transparent",
-          )}
-          style={{ backgroundColor: color }}
-          onClick={() => onChange(color)}
-        />
-      ))}
-    </div>
-  );
-}
-
-function BoardColumnPreview({ draft }: { draft: NotebookDraft }) {
-  const title = draft.name.trim() || "Notebook name";
-  const desc = draft.description.trim();
-  return (
-    <div className="rounded-xl border border-[#e8e2dc] bg-[#faf7f5] p-3">
-      <div className="mb-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8c857f]">
-        Board preview
-      </div>
-      <div className="rounded-lg border border-[#e8e2dc]/80 bg-white px-2 py-2">
-        <div className="flex items-center gap-2">
-          <span
-            className="h-2 w-2 shrink-0 rounded-full"
-            style={{ backgroundColor: draft.color }}
-          />
-          <h3 className="font-headline text-[11px] font-semibold uppercase tracking-widest text-[#2d2a27]">
-            {title}
-          </h3>
-          <span className="rounded-full bg-[#ede8e3] px-1.5 py-0.5 text-[10px] font-semibold text-[#8c857f]">
-            00
-          </span>
-        </div>
-        {desc ? (
-          <p className="mt-1.5 line-clamp-2 border-t border-[#f0ece8] pt-1.5 text-[10px] leading-relaxed text-[#6b6560]">
-            {desc}
-          </p>
-        ) : null}
-      </div>
-    </div>
-  );
-}
 
 export function NotebookDialog({
   open,
@@ -97,10 +39,7 @@ export function NotebookDialog({
 }) {
   const duplicateName = useMemo(() => {
     const name = draft.name.trim().toLowerCase();
-    if (!name) {
-      return false;
-    }
-
+    if (!name) return false;
     return existingNotebooks.some(
       (n) =>
         n.name.trim().toLowerCase() === name &&
@@ -110,95 +49,102 @@ export function NotebookDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[min(90vh,640px)] gap-0 overflow-y-auto sm:max-w-lg">
-        <DialogHeader className="space-y-1 pb-2">
-          <DialogTitle className="text-lg">{editing ? "Edit notebook" : "Create notebook"}</DialogTitle>
-          <DialogDescription className="text-[13px] leading-relaxed">
-            Name and color your column. Add a description so you (and AI) remember what belongs here.
-          </DialogDescription>
+      <DialogContent className="w-[380px] gap-0 overflow-hidden border-[#ece4dc] p-0 shadow-2xl sm:max-w-none">
+        {/* Header */}
+        <DialogHeader className="px-5 pt-4 pb-3">
+          <div className="flex items-center gap-2">
+            <span
+              className="h-3 w-3 rounded-full transition-colors"
+              style={{ backgroundColor: draft.color }}
+            />
+            <DialogTitle className="text-[15px] font-semibold tracking-tight text-[#2d2a27]">
+              {editing ? "Edit notebook" : "New notebook"}
+            </DialogTitle>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-5 py-2">
-          <BoardColumnPreview draft={draft} />
-
-          <div className="space-y-2">
-            <Label htmlFor="notebook-name" className="text-[11px] uppercase tracking-widest text-[#8c857f]">
-              Name
-            </Label>
-            <Input
-              id="notebook-name"
-              value={draft.name}
-              onChange={(event) =>
-                onDraftChange({
-                  ...draft,
-                  name: event.currentTarget.value,
-                })
-              }
-              placeholder="Series 65, Client work, Personal…"
-              className="h-10"
-            />
-            <p className="text-xs leading-5 text-[#8c857f]">
-              Use a distinct name so sorting stays accurate when you have many notebooks.
+        {/* Body */}
+        <div className="space-y-3 px-5 pb-2">
+          {/* Name */}
+          <Input
+            value={draft.name}
+            onChange={(e) =>
+              onDraftChange({ ...draft, name: e.currentTarget.value })
+            }
+            placeholder="Notebook name…"
+            autoFocus
+            className={clsx(
+              "h-9 border-[#ece4dc] bg-[#faf7f5] text-[13px] font-medium focus:bg-white",
+              duplicateName && "border-[#ba1a1a] focus-visible:ring-[#ba1a1a]/30",
+            )}
+          />
+          {duplicateName && (
+            <p className="-mt-2 text-[11px] text-[#ba1a1a]">
+              Name already exists.
             </p>
-            {duplicateName ? (
-              <p className="text-xs font-medium text-[#7a5c40]">
-                You already have a notebook with this name. You can still save if you want duplicates.
-              </p>
-            ) : null}
-          </div>
+          )}
 
-          <div className="space-y-2">
-            <Label htmlFor="notebook-description" className="text-[11px] uppercase tracking-widest text-[#8c857f]">
-              Description
-            </Label>
-            <Textarea
-              id="notebook-description"
-              value={draft.description}
-              onChange={(event) =>
-                onDraftChange({
-                  ...draft,
-                  description: event.currentTarget.value,
-                })
-              }
-              placeholder="What goes in this notebook? e.g. Exam prep, meeting notes, ideas for Project X…"
-              className="min-h-[88px] resize-y text-[13px] leading-relaxed"
-            />
-            <p className="text-xs leading-5 text-[#8c857f]">
-              Optional. Shown in the classifier prompt to improve filing accuracy.
-            </p>
-          </div>
+          {/* Description */}
+          <Textarea
+            value={draft.description}
+            onChange={(e) =>
+              onDraftChange({ ...draft, description: e.currentTarget.value })
+            }
+            placeholder="What belongs here? Helps AI sort…"
+            className="min-h-[56px] resize-none border-[#ece4dc] bg-[#faf7f5] text-[12px] placeholder:text-[#b5aea8] focus:bg-white"
+          />
 
-          <div className="h-px bg-[#e8e2dc]" />
-
-          <div className="space-y-2">
-            <Label className="text-[11px] uppercase tracking-widest text-[#8c857f]">Accent color</Label>
-            <NotebookColorPicker
-              value={draft.color}
-              onChange={(color) =>
-                onDraftChange({
-                  ...draft,
-                  color,
-                })
-              }
-            />
+          {/* Color */}
+          <div className="flex items-center gap-1.5">
+            {NOTEBOOK_COLORS.map((color) => (
+              <button
+                key={color}
+                type="button"
+                className={clsx(
+                  "flex h-7 w-7 items-center justify-center rounded-full transition-all",
+                  draft.color === color
+                    ? "scale-110 ring-2 ring-[#2d2a27] ring-offset-2 ring-offset-white"
+                    : "opacity-50 hover:opacity-100",
+                )}
+                style={{ backgroundColor: color }}
+                onClick={() => onDraftChange({ ...draft, color })}
+              >
+                {draft.color === color && (
+                  <Check className="h-3.5 w-3.5 text-white" strokeWidth={3} />
+                )}
+              </button>
+            ))}
           </div>
         </div>
 
-        <DialogFooter className="mt-4 flex-col gap-2 border-t border-[#f0ece8] pt-4 sm:flex-row sm:justify-between sm:gap-0">
-          <div className="flex flex-wrap gap-2">
-            {editing && onDelete ? (
-              <Button variant="ghost" className="text-[#6b6560]" onClick={onDelete}>
-                Delete
-              </Button>
-            ) : null}
-          </div>
-          <div className="flex flex-wrap justify-end gap-2">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
+        {/* Footer */}
+        <DialogFooter className="flex items-center justify-between border-t border-[#f0ece8] bg-[#faf7f5] px-5 py-2.5">
+          {editing && onDelete ? (
+            <Button
+              variant="ghost"
+              className="h-8 px-2 text-[#b5aea8] hover:text-[#ba1a1a] hover:bg-[#fff3ee]"
+              onClick={onDelete}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          ) : (
+            <div />
+          )}
+          <div className="flex items-center gap-2">
+            <Button
+              variant="ghost"
+              className="h-8 px-3 text-[12px] text-[#8c857f]"
+              onClick={() => onOpenChange(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={() => void onSubmit()} disabled={syncing}>
-              {syncing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-              {editing ? "Save notebook" : "Create notebook"}
+            <Button
+              className="h-8 px-4 text-[12px] font-medium"
+              onClick={() => void onSubmit()}
+              disabled={syncing || !draft.name.trim()}
+            >
+              {syncing ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+              {editing ? "Save" : "Create"}
             </Button>
           </div>
         </DialogFooter>
