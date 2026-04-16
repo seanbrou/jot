@@ -1,49 +1,66 @@
-import { LockKeyhole, Sparkles } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { GoogleSignInForm } from "./google-sign-in-form";
 
 export function AuthGate() {
   return (
-    <div className="flex h-full min-h-[32rem] items-center justify-center px-6 py-10">
-      <div className="grid w-full max-w-5xl gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-        <div className="rounded-[2rem] border border-[#e8e2dc] bg-white p-8 shadow-[0_24px_60px_rgba(45,42,39,0.07)]">
-          <div className="mb-3 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#8c857f]">
-            <Sparkles className="h-3.5 w-3.5" />
-            Private knowledge
-          </div>
-          <h2 className="font-headline text-4xl font-bold tracking-tight text-[#2d2a27]">
-            Sign in to open your notebooks.
-          </h2>
-          <p className="mt-4 max-w-xl text-sm leading-7 text-[#6b6560]">
-            Oat keeps every note tied to your account. Once you sign in, quick capture,
-            search, AI routing, and your board all stay private to you.
-          </p>
-          <div className="mt-8 grid gap-3 sm:grid-cols-2">
-            <div className="rounded-[1.4rem] bg-[#f7f4f0] p-4">
-              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8c857f]">
-                Quick capture
-              </div>
-              <div className="mt-2 text-sm leading-6 text-[#6b6560]">
-                Press <span className="font-semibold text-[#2d2a27]">Alt + N</span> anywhere
-                and file a thought into your account.
-              </div>
+    <div className="flex h-full min-h-[24rem] items-center justify-center px-6 py-10">
+      <div className="w-full max-w-md">
+        {/* Card */}
+        <div className="rounded-2xl border border-[#e8e2dc] bg-white p-8 shadow-[0_8px_32px_rgba(45,42,39,0.06)]">
+          {/* Brand */}
+          <div className="mb-6 flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#b35c2a]/10">
+              <Sparkles className="h-5 w-5 text-[#b35c2a]" />
             </div>
-            <div className="rounded-[1.4rem] bg-[#f7f4f0] p-4">
-              <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[#8c857f]">
-                AI sorting
-              </div>
-              <div className="mt-2 text-sm leading-6 text-[#6b6560]">
-                New notes are routed into the best existing notebook and stay searchable.
-              </div>
+            <div>
+              <h2 className="text-xl font-bold tracking-tight text-[#2d2a27]">
+                Welcome to Jot
+              </h2>
+              <p className="text-[13px] text-[#8c857f]">
+                Sign in to access your notes
+              </p>
             </div>
           </div>
-        </div>
 
-        <div className="rounded-[2rem] border border-[#e8e2dc] bg-white p-8 shadow-[0_24px_60px_rgba(45,42,39,0.07)]">
-          <div className="mb-4 flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.2em] text-[#8c857f]">
-            <LockKeyhole className="h-3.5 w-3.5" />
-            Google sign-in
-          </div>
+          {/* Sign in */}
           <GoogleSignInForm />
+
+          {/* Features */}
+          <div className="mt-6 space-y-3 border-t border-[#f0ece8] pt-5">
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f7f4f0] text-[10px] font-bold text-[#b35c2a]">
+                1
+              </div>
+              <div>
+                <div className="text-[13px] font-medium text-[#2d2a27]">AI auto-filing</div>
+                <div className="text-[12px] text-[#8c857f]">
+                  Notes are sorted into the right notebook automatically
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f7f4f0] text-[10px] font-bold text-[#b35c2a]">
+                2
+              </div>
+              <div>
+                <div className="text-[13px] font-medium text-[#2d2a27]">Quick capture</div>
+                <div className="text-[12px] text-[#8c857f]">
+                  Press Alt + N anywhere to jot a thought
+                </div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3">
+              <div className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#f7f4f0] text-[10px] font-bold text-[#b35c2a]">
+                3
+              </div>
+              <div>
+                <div className="text-[13px] font-medium text-[#2d2a27]">Export anywhere</div>
+                <div className="text-[12px] text-[#8c857f]">
+                  Send notes to ChatGPT, Claude, Gemini, or Grok
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

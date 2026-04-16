@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-react";
+import { Loader2, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -52,107 +52,107 @@ export function NoteDialog({
 
   return (
     <Dialog open={state.open} onOpenChange={onOpenChange}>
-      <DialogContent className="gap-0 overflow-hidden border-[#c9c1b9] p-0 shadow-[0_24px_48px_-12px_rgba(45,42,39,0.18)] sm:max-w-lg">
-        <div className="border-b border-[#e8e2dc] bg-[#f6f2ed] px-6 py-4">
-          <DialogHeader className="space-y-1 text-left">
-            <DialogTitle className="text-lg font-semibold tracking-tight text-[#1f1d1b]">
-              {state.noteId ? "Edit note" : "New note"}
+      <DialogContent className="gap-0 overflow-hidden border-[#e8e2dc] p-0 shadow-xl sm:max-w-lg">
+        {/* Header */}
+        <div className="border-b border-[#f0ece8] bg-white px-6 pt-5 pb-4">
+          <DialogHeader className="space-y-0.5 text-left">
+            <DialogTitle className="text-[17px] font-semibold tracking-tight text-[#2d2a27]">
+              {isCreate ? "New note" : "Edit note"}
             </DialogTitle>
-            <DialogDescription className="text-[13px] leading-relaxed text-[#4a4540]">
+            <DialogDescription className="text-[13px] text-[#8c857f]">
               {isCreate
-                ? "Write it down first. AI filing is on by default—you can pick a notebook manually if you prefer."
-                : "Update your note and adjust filing or AI routing as needed."}
+                ? "Write it down — AI will file it for you."
+                : "Update your note below."}
             </DialogDescription>
           </DialogHeader>
         </div>
 
+        {/* Body */}
         <div className="space-y-4 bg-white px-6 py-5">
-          <div className="space-y-2">
-            <Label htmlFor="note-body" className="text-[11px] font-semibold uppercase tracking-widest text-[#5c5650]">
-              Content
-            </Label>
-            <Textarea
-              id="note-body"
-              value={state.body}
-              onChange={(event) =>
-                onStateChange({
-                  ...state,
-                  body: event.currentTarget.value,
-                })
+          <Textarea
+            value={state.body}
+            onChange={(e) =>
+              onStateChange({ ...state, body: e.currentTarget.value })
+            }
+            placeholder="Jot something down…"
+            autoFocus
+            className="min-h-[10rem] resize-none border-[#e8e2dc] bg-[#faf7f5] text-[14px] leading-relaxed text-[#2d2a27] placeholder:text-[#b5aea8] focus-visible:ring-[#b35c2a]/30"
+          />
+
+          {/* AI filing row */}
+          <div className="flex items-center justify-between rounded-lg border border-[#f0ece8] bg-[#faf7f5] px-4 py-3">
+            <div className="flex items-center gap-2.5">
+              <Sparkles className="h-4 w-4 text-[#b35c2a]" />
+              <div>
+                <div className="text-[13px] font-medium text-[#2d2a27]">AI auto-filing</div>
+                <div className="text-[11px] text-[#8c857f]">
+                  {state.useAiRouting
+                    ? "Sorted into the best notebook automatically"
+                    : "You pick the notebook"}
+                </div>
+              </div>
+            </div>
+            <Switch
+              checked={state.useAiRouting}
+              onCheckedChange={(checked) =>
+                onStateChange({ ...state, useAiRouting: checked })
               }
-              placeholder="Series 65 reminder, research thought, project note…"
-              className="min-h-[10rem] border-[#d4cec8] bg-[#fdfcfa] text-[15px] leading-relaxed text-[#1f1d1b] shadow-inner placeholder:text-[#8c857f] focus-visible:ring-[#b35c2a]/40"
             />
           </div>
 
-          <div className="rounded-xl border border-[#d4cec8] bg-[#f6f2ed] p-3.5">
-            <div className="flex items-start justify-between gap-3">
-              <div className="min-w-0 pt-0.5">
-                <Label htmlFor="note-ai-routing" className="text-sm font-semibold text-[#1f1d1b]">
-                  Let AI choose notebook
-                </Label>
-                <p className="mt-1 text-xs leading-5 text-[#4a4540]">
-                  {state.useAiRouting
-                    ? "After save, it goes through AI sorting into the best column."
-                    : "Choose Inbox or a specific notebook below."}
-                </p>
-              </div>
-              <Switch
-                id="note-ai-routing"
-                checked={state.useAiRouting}
-                onCheckedChange={(checked) => onStateChange({ ...state, useAiRouting: checked })}
-                className="mt-0.5"
-              />
+          {/* Manual notebook select */}
+          {!state.useAiRouting && (
+            <div className="space-y-1.5">
+              <Label className="text-[11px] font-medium uppercase tracking-wider text-[#8c857f]">
+                Notebook
+              </Label>
+              <Select
+                value={state.notebookId ?? INBOX_NOTEBOOK_ID}
+                onValueChange={(value) =>
+                  onStateChange({
+                    ...state,
+                    notebookId: value === INBOX_NOTEBOOK_ID ? null : value,
+                  })
+                }
+              >
+                <SelectTrigger className="border-[#e8e2dc] bg-white">
+                  <SelectValue placeholder="Choose a notebook" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={INBOX_NOTEBOOK_ID}>Inbox</SelectItem>
+                  {notebooks.map((nb) => (
+                    <SelectItem key={nb.id} value={nb.id}>
+                      {nb.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-
-            {state.useAiRouting ? null : (
-              <div className="mt-3 space-y-1.5 border-t border-[#e0d9d2] pt-3">
-                <Label className="text-[10px] font-semibold uppercase tracking-wider text-[#5c5650]">
-                  Notebook
-                </Label>
-                <Select
-                  value={state.notebookId ?? INBOX_NOTEBOOK_ID}
-                  onValueChange={(value) =>
-                    onStateChange({
-                      ...state,
-                      notebookId: value === INBOX_NOTEBOOK_ID ? null : value,
-                    })
-                  }
-                >
-                  <SelectTrigger className="border-[#c9c1b9] bg-white">
-                    <SelectValue placeholder="Choose a notebook" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value={INBOX_NOTEBOOK_ID}>Inbox</SelectItem>
-                    {notebooks.map((notebook) => (
-                      <SelectItem key={notebook.id} value={notebook.id}>
-                        {notebook.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            )}
-          </div>
+          )}
         </div>
 
-        <DialogFooter className="gap-2 border-t border-[#e8e2dc] bg-[#faf7f5] px-6 py-4 sm:justify-end">
-          {state.noteId && onDelete ? (
-            <Button variant="ghost" className="mr-auto text-[#6b6560]" onClick={onDelete}>
+        {/* Footer */}
+        <DialogFooter className="gap-2 border-t border-[#f0ece8] bg-[#faf7f5] px-6 py-3 sm:justify-end">
+          {state.noteId && onDelete && (
+            <Button variant="ghost" className="mr-auto text-[#8c857f] hover:text-[#ba1a1a]" onClick={onDelete}>
               Delete
             </Button>
-          ) : null}
-          {state.noteId && onReclassify ? (
-            <Button variant="outline" onClick={onReclassify}>
-              Reclassify
+          )}
+          {state.noteId && onReclassify && (
+            <Button variant="outline" className="text-[13px]" onClick={onReclassify}>
+              Re-sort
             </Button>
-          ) : null}
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          )}
+          <Button variant="outline" className="text-[13px]" onClick={() => onOpenChange(false)}>
             Cancel
           </Button>
-          <Button onClick={() => void onSubmit()} disabled={syncing}>
+          <Button
+            className="text-[13px]"
+            onClick={() => void onSubmit()}
+            disabled={syncing || !state.body.trim()}
+          >
             {syncing ? <Loader2 className="h-4 w-4 animate-spin" /> : null}
-            {state.noteId ? "Save note" : "Create note"}
+            {state.noteId ? "Save" : "Create"}
           </Button>
         </DialogFooter>
       </DialogContent>

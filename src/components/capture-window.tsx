@@ -2,7 +2,7 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { motion, AnimatePresence } from "framer-motion";
-import { AlertCircle, ArrowUp, Check, GripVertical, Loader2 } from "lucide-react";
+import { AlertCircle, ArrowUp, Check, Loader2 } from "lucide-react";
 import { hideCaptureWindow } from "../lib/desktop";
 import { useOatApp } from "../hooks/use-oat-app";
 import { GoogleSignInForm } from "./google-sign-in-form";
@@ -35,9 +35,7 @@ export function CaptureWindow() {
   useEffect(() => {
     focusEditor();
 
-    if (!isTauriEnvironment()) {
-      return;
-    }
+    if (!isTauriEnvironment()) return;
 
     const currentWindow = getCurrentWindow();
     let disposed = false;
@@ -55,9 +53,7 @@ export function CaptureWindow() {
       });
 
     void listen("oat://focus-capture", () => {
-      if (!disposed) {
-        focusEditor();
-      }
+      if (!disposed) focusEditor();
     }).then((cleanup) => {
       removeEventListener = cleanup;
     });
@@ -88,7 +84,6 @@ export function CaptureWindow() {
           await hideCaptureWindow();
           return;
         }
-
         window.close();
       }, 400);
     } catch {
@@ -109,15 +104,15 @@ export function CaptureWindow() {
   function renderContent() {
     if (!authReady) {
       return (
-        <div className="flex items-center justify-center py-4 text-sm font-medium text-on-surface-variant">
-          <Loader2 className="h-4 w-4 animate-spin text-primary" />
+        <div className="flex items-center justify-center py-4 text-sm font-medium text-[#8c857f]">
+          <Loader2 className="h-4 w-4 animate-spin text-[#b35c2a]" />
         </div>
       );
     }
 
     if (!isAuthenticated) {
       return (
-        <div className="p-3">
+        <div className="p-4">
           <GoogleSignInForm compact />
         </div>
       );
@@ -134,7 +129,7 @@ export function CaptureWindow() {
               transition={{ duration: 0.12 }}
               className="overflow-hidden"
             >
-              <div className="flex items-center gap-1.5 px-4 pb-1 pt-2.5 text-[11px] font-medium text-error">
+              <div className="flex items-center gap-1.5 px-4 pb-1 pt-2.5 text-[11px] font-medium text-[#ba1a1a]">
                 <AlertCircle className="h-3 w-3 shrink-0" />
                 <span className="truncate">{error}</span>
               </div>
@@ -142,7 +137,7 @@ export function CaptureWindow() {
           )}
         </AnimatePresence>
 
-        <div className="flex items-end gap-2.5 py-2.5 pl-4 pr-2.5">
+        <div className="flex items-end gap-2 px-4 py-3">
           <textarea
             ref={inputRef}
             value={draft}
@@ -163,19 +158,19 @@ export function CaptureWindow() {
             }}
             placeholder="Jot something down…"
             rows={1}
-            className="w-full min-w-0 flex-1 resize-none bg-transparent font-body text-[14px] leading-relaxed text-on-surface outline-none placeholder:text-outline"
+            className="w-full min-w-0 flex-1 resize-none bg-transparent text-[14px] leading-relaxed text-[#2d2a27] outline-none placeholder:text-[#b5aea8]"
           />
           <button
             type="button"
             onClick={() => void submitDraft()}
             disabled={saving || syncing || !draft.trim()}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary text-on-primary transition-all hover:bg-[#9a4f22] hover:shadow-md disabled:bg-outline-variant disabled:text-outline disabled:shadow-none"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#b35c2a] text-white transition-all hover:bg-[#9a4f22] hover:shadow-md disabled:bg-[#d4cec8] disabled:text-[#b5aea8] disabled:shadow-none"
             aria-label="Save note"
           >
             {saving ? (
               <Loader2 className="h-3.5 w-3.5 animate-spin" />
             ) : (
-              <ArrowUp className="h-3.5 w-3.5" strokeWidth={2.5} />
+              <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
             )}
           </button>
         </div>
@@ -184,21 +179,25 @@ export function CaptureWindow() {
   }
 
   return (
-    <div className="capture-shell flex h-screen w-screen items-center justify-center">
+    <div className="flex h-screen w-screen items-center justify-center bg-transparent">
       <motion.div
         initial={{ opacity: 0, scale: 0.96, y: 4 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
-        className="relative flex w-full items-stretch overflow-hidden rounded-2xl bg-surface"
+        className="relative flex w-full items-stretch overflow-hidden rounded-2xl border border-[#e8e2dc] bg-white shadow-lg"
       >
-        {isTauriEnvironment() ? (
+        {isTauriEnvironment() && (
           <div
             data-tauri-drag-region
-            className="flex w-7 shrink-0 cursor-grab items-center justify-center rounded-l-2xl bg-surface-container-high/60 active:cursor-grabbing"
+            className="flex w-7 shrink-0 cursor-grab items-center justify-center rounded-l-2xl bg-[#f7f4f0] active:cursor-grabbing"
           >
-            <GripVertical className="h-3.5 w-3.5 text-outline/50 pointer-events-none" />
+            <div className="flex gap-0.5">
+              <span className="block h-1 w-1 rounded-full bg-[#d4cec8]" />
+              <span className="block h-1 w-1 rounded-full bg-[#d4cec8]" />
+              <span className="block h-1 w-1 rounded-full bg-[#d4cec8]" />
+            </div>
           </div>
-        ) : null}
+        )}
 
         <div className="relative min-w-0 flex-1">
           <AnimatePresence>
@@ -208,7 +207,7 @@ export function CaptureWindow() {
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.1 }}
-                className="absolute inset-0 z-50 flex items-center justify-center bg-surface/95 backdrop-blur-sm"
+                className="absolute inset-0 z-50 flex items-center justify-center bg-white/95 backdrop-blur-sm"
               >
                 <motion.div
                   initial={{ scale: 0.85 }}
@@ -216,10 +215,10 @@ export function CaptureWindow() {
                   transition={{ duration: 0.15, ease: [0.22, 1, 0.36, 1] }}
                   className="flex items-center gap-2"
                 >
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary/12">
-                    <Check className="h-3.5 w-3.5 text-primary" strokeWidth={2.5} />
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-[#b35c2a]/10">
+                    <Check className="h-3.5 w-3.5 text-[#b35c2a]" strokeWidth={2.5} />
                   </div>
-                  <span className="text-[13px] font-semibold text-on-surface">
+                  <span className="text-[13px] font-semibold text-[#2d2a27]">
                     Saved
                   </span>
                 </motion.div>
