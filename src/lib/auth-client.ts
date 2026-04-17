@@ -4,6 +4,7 @@ import { createAuthClient } from "better-auth/react";
 export const convexSiteUrl = import.meta.env.VITE_CONVEX_SITE_URL?.trim() ?? "";
 export const convexDeploymentUrl = import.meta.env.VITE_CONVEX_URL?.trim() ?? "";
 export const appSiteUrl = window.location.origin;
+export const appCallbackUrl = new URL(import.meta.env.BASE_URL, window.location.origin).toString();
 
 export function hasBackendConfig() {
   return Boolean(convexSiteUrl && convexDeploymentUrl);

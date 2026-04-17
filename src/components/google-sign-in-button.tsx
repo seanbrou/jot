@@ -1,5 +1,5 @@
 import { toast } from "sonner";
-import { appSiteUrl, authClient } from "../lib/auth-client";
+import { appCallbackUrl, authClient } from "../lib/auth-client";
 import { Button } from "./ui/button";
 
 function toErrorMessage(error: unknown) {
@@ -13,10 +13,9 @@ export function GoogleSignInButton({
 }) {
   async function signInWithGoogle() {
     try {
-      const callbackURL = appSiteUrl;
       const result = await authClient.signIn.social({
         provider: "google",
-        callbackURL,
+        callbackURL: appCallbackUrl,
       });
 
       if (result?.error) {
