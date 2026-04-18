@@ -22,7 +22,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { Archive, Bell, ChevronLeft, ChevronRight, Calendar as CalendarIcon, MoreHorizontal, Pin, Plus, Trash2, X } from "lucide-react";
+import { Archive, Bell, ChevronLeft, ChevronRight, MoreHorizontal, Pin, Plus, Trash2, X } from "lucide-react";
 import { INBOX_NOTEBOOK_ID, STATUS_LABELS } from "../lib/constants";
 import type { BoardView, Notebook, Note } from "../lib/types";
 
