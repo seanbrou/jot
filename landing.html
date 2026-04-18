@@ -155,113 +155,129 @@
       position: relative;
     }
     .hero-mockup-frame {
-      border-radius: 16px; overflow: hidden;
+      border-radius: 12px; overflow: hidden;
       background: var(--surface);
       box-shadow: var(--shadow-xl);
       border: 1px solid var(--border);
-      aspect-ratio: 16/10;
+      height: 560px;
       position: relative;
       display: flex; flex-direction: column;
     }
     .mock-app { display: flex; flex: 1; overflow: hidden; }
-    /* Sidebar — matches real app sidebar */
+    /* Sidebar — matches real app exactly */
     .mock-sidebar {
-      width: 220px; background: var(--surface); border-right: 1px solid var(--border);
-      padding: 16px 12px; flex-shrink: 0; display: flex; flex-direction: column;
+      width: 220px; background: var(--white); border-right: 1px solid #e8e2dc;
+      flex-shrink: 0; display: flex; flex-direction: column;
     }
-    .mock-sidebar-brand {
-      display: flex; align-items: center; gap: 10px; padding: 4px 8px 16px;
+    .mock-sidebar-logo-area {
+      display: flex; align-items: center; gap: 10px;
+      height: 56px; padding: 0 12px; border-bottom: 1px solid #f0ece8;
     }
     .mock-sidebar-logo {
       width: 32px; height: 32px; border-radius: 8px; background: var(--accent);
       color: white; display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 15px;
+      font-weight: 700; font-size: 11px; flex-shrink: 0;
     }
-    .mock-sidebar-name { font-weight: 700; font-size: 17px; color: var(--text); letter-spacing: -0.02em; }
-    .mock-sidebar-greeting {
-      font-size: 13px; color: var(--text-muted); padding: 0 10px 14px;
-      font-weight: 500; line-height: 1.3;
-    }
-    .mock-sidebar-nav { margin-bottom: 8px; }
+    .mock-sidebar-name { font-weight: 700; font-size: 15px; color: var(--text); letter-spacing: -0.02em; }
+    .mock-sidebar-nav { padding: 12px 8px; flex: 1; }
     .mock-sidebar-nav-item {
-      display: flex; align-items: center; gap: 10px; padding: 8px 10px;
-      border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--text-muted);
+      display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+      border-radius: 8px; font-size: 13px; font-weight: 500; color: #6b6560;
       margin-bottom: 2px;
     }
-    .mock-sidebar-nav-item.active { background: rgba(179,92,42,0.08); color: var(--accent); font-weight: 600; }
-    .mock-sidebar-nav-item .mock-icon { width: 16px; height: 16px; }
-    .mock-sidebar-divider { height: 1px; background: var(--border); margin: 6px 10px 10px; }
-    .mock-sidebar-section-label {
-      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em;
-      color: var(--text-dim); padding: 4px 10px 6px; margin-top: 2px;
+    .mock-sidebar-nav-item.active { background: rgba(179,92,42,0.08); color: var(--accent); }
+    .mock-sidebar-nav-item svg { width: 18px; height: 18px; }
+    .mock-sidebar-divider { height: 1px; background: #f0ece8; margin: 0 8px; }
+    .mock-sidebar-new-btn {
+      display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+      margin: 4px 8px; border-radius: 8px; font-size: 13px; font-weight: 500; color: #6b6560;
     }
-    .mock-sidebar-notebook {
-      display: flex; align-items: center; gap: 9px; padding: 7px 10px;
-      border-radius: 10px; font-size: 13px; font-weight: 500; color: var(--text-muted);
-      margin-bottom: 1px; cursor: default;
+    .mock-sidebar-new-btn svg { width: 18px; height: 18px; }
+    .mock-sidebar-user {
+      border-top: 1px solid #f0ece8; padding: 8px;
     }
-    .mock-sidebar-notebook:hover { background: var(--surface-2); }
-    .mock-sidebar-notebook.active { background: var(--white); color: var(--text); font-weight: 600; box-shadow: 0 1px 4px rgba(0,0,0,0.05); }
-    .mock-nb-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
-    .mock-nb-count {
-      margin-left: auto; font-size: 11px; background: var(--surface-3);
-      color: var(--text-dim); padding: 2px 7px; border-radius: 100px; font-weight: 600;
+    .mock-sidebar-user-btn {
+      display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+      border-radius: 8px;
     }
+    .mock-sidebar-avatar {
+      width: 32px; height: 32px; border-radius: 50%; background: #ede8e3;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 600; color: #6b6560; flex-shrink: 0;
+    }
+    .mock-sidebar-user-info { min-width: 0; }
+    .mock-sidebar-user-name { font-size: 13px; font-weight: 500; color: var(--text); }
+    .mock-sidebar-user-status { font-size: 11px; color: #8c857f; }
     /* Main area */
     .mock-main {
-      flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--white);
+      flex: 1; display: flex; flex-direction: column; overflow: hidden; background: var(--surface);
     }
     .mock-toolbar {
-      display: flex; align-items: center; gap: 10px; padding: 10px 16px;
-      border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--white);
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      height: 56px; padding: 0 20px;
+      border-bottom: 1px solid #e8e2dc; flex-shrink: 0; background: var(--white);
     }
     .mock-search {
-      flex: 1; display: flex; align-items: center; gap: 7px;
-      background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
-      padding: 7px 12px; font-size: 13px; color: var(--text-dim);
+      display: flex; align-items: center; gap: 9px;
+      background: var(--surface); border: 1px solid #e8e2dc; border-radius: 8px;
+      padding: 6px 12px 6px 32px; font-size: 13px; color: #b5aea8;
+      position: relative; width: 224px;
     }
-    .mock-search-icon { width: 14px; height: 14px; opacity: 0.45; }
+    .mock-search-icon {
+      position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+      width: 16px; height: 16px; opacity: 0.5; color: #b5aea8;
+    }
     .mock-new-btn {
-      display: flex; align-items: center; gap: 5px; padding: 7px 16px;
-      background: var(--accent); color: white; border-radius: 10px;
-      font-size: 13px; font-weight: 600;
+      display: flex; align-items: center; gap: 8px; padding: 8px 14px;
+      background: var(--accent); color: white; border-radius: 8px;
+      font-size: 13px; font-weight: 500;
     }
-    .mock-new-btn .mock-plus { width: 14px; height: 14px; }
+    .mock-new-btn .mock-plus { width: 16px; height: 16px; }
+    .mock-board-header {
+      padding: 20px 20px 0;
+    }
+    .mock-board-header h2 {
+      font-size: 18px; font-weight: 600; letter-spacing: -0.01em; color: var(--text); margin: 0;
+    }
+    .mock-board-header p {
+      font-size: 13px; color: #8c857f; margin: 2px 0 0;
+    }
     /* Board layout */
     .mock-board {
-      flex: 1; display: flex; gap: 14px; padding: 16px; overflow: hidden; background: var(--surface);
+      flex: 1; display: flex; gap: 0; padding: 16px 20px 20px; overflow: hidden;
     }
     .mock-column {
-      flex: 1; display: flex; flex-direction: column; min-width: 0;
+      width: 288px; flex-shrink: 0; display: flex; flex-direction: column;
+      border-radius: 16px; margin-right: 14px;
     }
     .mock-col-header {
-      display: flex; align-items: center; gap: 8px; padding: 4px 4px 12px; flex-shrink: 0;
+      display: flex; align-items: center; gap: 8px; padding: 8px 8px 8px;
     }
-    .mock-col-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .mock-col-dot { width: 8px; height: 8px; border-radius: 50%; }
     .mock-col-title {
-      font-size: 12px; font-weight: 700; text-transform: uppercase;
-      letter-spacing: 0.07em; color: var(--text-muted);
+      font-size: 13px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: #2d2a27;
     }
     .mock-col-count {
-      font-size: 10px; background: var(--surface-3); color: var(--text-dim);
-      padding: 2px 8px; border-radius: 100px; font-weight: 600;
+      font-size: 10px; background: #ede8e3; color: #8c857f;
+      padding: 2px 6px; border-radius: 100px; font-weight: 600;
     }
     .mock-col-body {
-      flex: 1; display: flex; flex-direction: column; gap: 10px; overflow: hidden;
+      flex: 1; display: flex; flex-direction: column; gap: 8px; overflow: hidden;
     }
     /* Cards — 1:1 match with real app note cards */
     .mock-card {
-      background: var(--white); border: 1px solid rgba(232,226,220,0.6); border-radius: 18px;
-      padding: 16px 18px; box-shadow: 0 12px 32px rgba(45,42,39,0.06);
-      transition: box-shadow 0.2s;
+      background: var(--white); border: 1px solid rgba(232,226,220,0.6); border-radius: 12px;
+      padding: 16px; transition: box-shadow 0.2s; cursor: default;
     }
-    .mock-card:hover { box-shadow: 0 12px 32px rgba(45,42,39,0.10); }
-    .mock-card.dimmed { background: var(--surface-2); opacity: 0.6; }
-    .mock-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+    .mock-card:hover { box-shadow: 0 4px 12px rgba(45,42,39,0.08); }
+    .mock-card.dimmed { background: #f7f4f0; border-style: dashed; border-color: rgba(212,206,200,0.6); }
+    .mock-card-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+    .mock-card-badges { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
     .mock-card-badge {
-      display: inline-flex; align-items: center; gap: 5px;
-      font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.12em;
-      padding: 3px 8px; border-radius: 7px;
+      display: inline-flex; align-items: center;
+      font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em;
+      padding: 2px 8px; border-radius: 100px;
     }
     .mock-card-badge.inbox { background: rgba(156,163,175,0.1); color: #9ca3af; }
     .mock-card-badge.finance { background: rgba(74,144,217,0.12); color: #4a90d9; }
@@ -270,39 +286,37 @@
     .mock-card-badge.personal { background: rgba(212,117,107,0.12); color: #d4756b; }
     .mock-card-badge.work { background: rgba(179,92,42,0.08); color: var(--accent); }
     .mock-card-status {
-      font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
-      padding: 2px 7px; border-radius: 100px;
+      font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em;
+      padding: 2px 8px; border-radius: 100px;
     }
     .mock-card-status.sorted { background: rgba(179,92,42,0.08); color: var(--accent); }
-    .mock-card-status.pending { background: rgba(255,189,46,0.12); color: #b8860b; }
-    .mock-card-status.review { background: rgba(99,102,241,0.08); color: #6366f1; }
+    .mock-card-status.pending { background: #f3efeb; color: #8c857f; }
+    .mock-card-status.review { background: #efe6da; color: #7a5c40; }
     .mock-card-status.archived { background: var(--surface-3); color: var(--text-dim); }
-    .mock-card-time { font-size: 10px; color: var(--text-dim); font-weight: 500; }
+    .mock-card-time { font-size: 10px; color: #b5aea8; font-weight: 500; }
     .mock-card-title {
-      font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; line-height: 1.3;
+      font-size: 13px; font-weight: 600; color: #2d2a27; margin-bottom: 4px; line-height: 1.35;
     }
     .mock-card-preview {
-      font-size: 12px; color: #8c857f; line-height: 1.6;
-      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      font-size: 12px; color: #8c857f; line-height: 1.5;
+      display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
     }
     .mock-card-bottom {
       display: flex; align-items: center; justify-content: space-between;
-      margin-top: 12px; padding-top: 10px; border-top: 1px dashed rgba(208,206,200,0.6);
+      margin-top: 12px; font-size: 10px; color: #b5aea8;
     }
-    .mock-card-meta {
-      display: flex; align-items: center; gap: 10px; font-size: 10px; color: var(--text-dim);
+    .mock-card-source { text-transform: capitalize; }
+    .mock-card-open { text-transform: uppercase; letter-spacing: 0.14em; font-weight: 500; }
+    .mock-card-drag-strip {
+      margin-top: 12px; margin-left: -16px; margin-right: -16px; margin-bottom: -16px;
+      height: 0; display: flex; align-items: center; justify-content: center; gap: 3px;
+      border-top: 1px dashed rgba(208,206,200,0.5);
+      background: #f7f3ef; border-radius: 0 0 12px 12px;
+      overflow: hidden;
     }
-    .mock-card-meta-item { display: flex; align-items: center; gap: 4px; }
-    .mock-card-meta-item svg { width: 12px; height: 12px; }
-    .mock-card-actions {
-      display: flex; align-items: center; gap: 2px;
+    .mock-card-drag-dot {
+      width: 4px; height: 4px; border-radius: 50%; background: #c9c1b9;
     }
-    .mock-card-action {
-      width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-      color: var(--text-dim); transition: background 0.15s;
-    }
-    .mock-card-action svg { width: 13px; height: 13px; }
-    .mock-card-action.pin-active { color: var(--accent); }
 
     /* ── Social proof ── */
     .social-proof {
@@ -579,63 +593,56 @@
       <div class="hero-mockup-frame">
         <div class="mock-app">
           <div class="mock-sidebar">
-            <div class="mock-sidebar-brand">
+            <div class="mock-sidebar-logo-area">
               <div class="mock-sidebar-logo">J</div>
               <span class="mock-sidebar-name">Jot</span>
             </div>
-            <div class="mock-sidebar-greeting">Good to see you, Sean</div>
             <div class="mock-sidebar-nav">
               <div class="mock-sidebar-nav-item active">
-                <svg class="mock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
                 Board
               </div>
               <div class="mock-sidebar-nav-item">
-                <svg class="mock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                 Calendar
               </div>
               <div class="mock-sidebar-nav-item">
-                <svg class="mock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="4" width="22" height="4" rx="1"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="21 8 21 21 3 21 3 8"/><rect x="1" y="4" width="22" height="4" rx="1"/></svg>
                 Archive
               </div>
+              <div class="mock-sidebar-divider"></div>
+              <div class="mock-sidebar-new-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                New notebook
+              </div>
             </div>
-            <div class="mock-sidebar-divider"></div>
-            <div class="mock-sidebar-section-label">Notebooks</div>
-            <div class="mock-sidebar-notebook active">
-              <div class="mock-nb-dot" style="background:var(--accent)"></div>
-              Inbox
-              <span class="mock-nb-count">3</span>
-            </div>
-            <div class="mock-sidebar-notebook">
-              <div class="mock-nb-dot" style="background:#4a90d9"></div>
-              Finance
-              <span class="mock-nb-count">2</span>
-            </div>
-            <div class="mock-sidebar-notebook">
-              <div class="mock-nb-dot" style="background:#7c5cbf"></div>
-              Research
-              <span class="mock-nb-count">1</span>
-            </div>
-            <div class="mock-sidebar-notebook">
-              <div class="mock-nb-dot" style="background:#2d7d46"></div>
-              Health
-            </div>
-            <div class="mock-sidebar-notebook">
-              <div class="mock-nb-dot" style="background:#d4756b"></div>
-              Personal
+            <div class="mock-sidebar-user">
+              <div class="mock-sidebar-user-btn">
+                <div class="mock-sidebar-avatar">S</div>
+                <div class="mock-sidebar-user-info">
+                  <div class="mock-sidebar-user-name">Sean</div>
+                  <div class="mock-sidebar-user-status">All caught up</div>
+                </div>
+              </div>
             </div>
           </div>
           <div class="mock-main">
             <div class="mock-toolbar">
-              <div class="mock-search">
+              <div class="mock-search" style="position:relative;">
                 <svg class="mock-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 Search notes…
               </div>
               <div class="mock-new-btn">
                 <svg class="mock-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                New note
+                New
               </div>
             </div>
+            <div class="mock-board-header">
+              <h2>Good to see you, Sean</h2>
+              <p>Drag notes between columns to organize.</p>
+            </div>
             <div class="mock-board">
+              <!-- Inbox column -->
               <div class="mock-column">
                 <div class="mock-col-header">
                   <div class="mock-col-dot" style="background:var(--accent)"></div>
@@ -645,7 +652,7 @@
                 <div class="mock-col-body">
                   <div class="mock-card">
                     <div class="mock-card-top">
-                      <div style="display:flex;align-items:center;gap:6px;">
+                      <div class="mock-card-badges">
                         <span class="mock-card-badge finance">Finance</span>
                         <span class="mock-card-status sorted">Sorted</span>
                       </div>
@@ -654,19 +661,14 @@
                     <div class="mock-card-title">Series 65 Study Notes</div>
                     <div class="mock-card-preview">Investment adviser exam prep — chapters 4 through 7 covering economic factors, business structure types…</div>
                     <div class="mock-card-bottom">
-                      <div class="mock-card-meta">
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>2m ago</span>
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>jot</span>
-                      </div>
-                      <div class="mock-card-actions">
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></div>
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v3"/><path d="m15.2 8 .8-3H8l.8 3"/><path d="M8 8 6 17h12l-2-9"/></svg></div>
-                      </div>
+                      <span class="mock-card-source">jot</span>
+                      <span class="mock-card-open">Open</span>
                     </div>
+                    <div class="mock-card-drag-strip"><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span></div>
                   </div>
                   <div class="mock-card">
                     <div class="mock-card-top">
-                      <div style="display:flex;align-items:center;gap:6px;">
+                      <div class="mock-card-badges">
                         <span class="mock-card-badge work">Work</span>
                         <span class="mock-card-status pending">Pending</span>
                       </div>
@@ -675,19 +677,14 @@
                     <div class="mock-card-title">Q1 Meeting Follow-up</div>
                     <div class="mock-card-preview">Action items from Monday sync — update revenue projections, send revised deck to Sarah…</div>
                     <div class="mock-card-bottom">
-                      <div class="mock-card-meta">
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>18m ago</span>
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>jot</span>
-                      </div>
-                      <div class="mock-card-actions">
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></div>
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v3"/><path d="m15.2 8 .8-3H8l.8 3"/><path d="M8 8 6 17h12l-2-9"/></svg></div>
-                      </div>
+                      <span class="mock-card-source">jot</span>
+                      <span class="mock-card-open">Open</span>
                     </div>
+                    <div class="mock-card-drag-strip"><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span></div>
                   </div>
                   <div class="mock-card">
                     <div class="mock-card-top">
-                      <div style="display:flex;align-items:center;gap:6px;">
+                      <div class="mock-card-badges">
                         <span class="mock-card-badge personal">Personal</span>
                         <span class="mock-card-status sorted">Sorted</span>
                       </div>
@@ -696,18 +693,14 @@
                     <div class="mock-card-title">Weekend Trip Packing List</div>
                     <div class="mock-card-preview">Hiking boots, rain jacket, first aid kit, camera gear, portable charger for the trail…</div>
                     <div class="mock-card-bottom">
-                      <div class="mock-card-meta">
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>1h ago</span>
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>jot</span>
-                      </div>
-                      <div class="mock-card-actions">
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></div>
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v3"/><path d="m15.2 8 .8-3H8l.8 3"/><path d="M8 8 6 17h12l-2-9"/></svg></div>
-                      </div>
+                      <span class="mock-card-source">jot</span>
+                      <span class="mock-card-open">Open</span>
                     </div>
+                    <div class="mock-card-drag-strip"><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span></div>
                   </div>
                 </div>
               </div>
+              <!-- Finance column -->
               <div class="mock-column">
                 <div class="mock-col-header">
                   <div class="mock-col-dot" style="background:#4a90d9"></div>
@@ -717,7 +710,7 @@
                 <div class="mock-col-body">
                   <div class="mock-card">
                     <div class="mock-card-top">
-                      <div style="display:flex;align-items:center;gap:6px;">
+                      <div class="mock-card-badges">
                         <span class="mock-card-badge finance">Finance</span>
                         <span class="mock-card-status sorted">Sorted</span>
                       </div>
@@ -726,19 +719,14 @@
                     <div class="mock-card-title">Portfolio Rebalance Plan</div>
                     <div class="mock-card-preview">TSLA position adjustment — reduce by 2 shares, move proceeds into NBIS. IVV stays as core holding…</div>
                     <div class="mock-card-bottom">
-                      <div class="mock-card-meta">
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>3h ago</span>
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>jot</span>
-                      </div>
-                      <div class="mock-card-actions">
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></div>
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v3"/><path d="m15.2 8 .8-3H8l.8 3"/><path d="M8 8 6 17h12l-2-9"/></svg></div>
-                      </div>
+                      <span class="mock-card-source">jot</span>
+                      <span class="mock-card-open">Open</span>
                     </div>
+                    <div class="mock-card-drag-strip"><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span></div>
                   </div>
                   <div class="mock-card">
                     <div class="mock-card-top">
-                      <div style="display:flex;align-items:center;gap:6px;">
+                      <div class="mock-card-badges">
                         <span class="mock-card-badge finance">Finance</span>
                         <span class="mock-card-status review">Review</span>
                       </div>
@@ -747,18 +735,14 @@
                     <div class="mock-card-title">Tax Planning Notes</div>
                     <div class="mock-card-preview">Roth conversion strategy for 2026 — consider bracket management, harvest losses before year-end…</div>
                     <div class="mock-card-bottom">
-                      <div class="mock-card-meta">
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Yesterday</span>
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>jot</span>
-                      </div>
-                      <div class="mock-card-actions">
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></div>
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v3"/><path d="m15.2 8 .8-3H8l.8 3"/><path d="M8 8 6 17h12l-2-9"/></svg></div>
-                      </div>
+                      <span class="mock-card-source">jot</span>
+                      <span class="mock-card-open">Open</span>
                     </div>
+                    <div class="mock-card-drag-strip"><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span></div>
                   </div>
                 </div>
               </div>
+              <!-- Research column -->
               <div class="mock-column">
                 <div class="mock-col-header">
                   <div class="mock-col-dot" style="background:#7c5cbf"></div>
@@ -768,7 +752,7 @@
                 <div class="mock-col-body">
                   <div class="mock-card">
                     <div class="mock-card-top">
-                      <div style="display:flex;align-items:center;gap:6px;">
+                      <div class="mock-card-badges">
                         <span class="mock-card-badge research">Research</span>
                         <span class="mock-card-status sorted">Sorted</span>
                       </div>
@@ -777,28 +761,24 @@
                     <div class="mock-card-title">AI Agent Architecture</div>
                     <div class="mock-card-preview">Multi-agent orchestration patterns — supervisor vs peer topology, shared memory vs message passing…</div>
                     <div class="mock-card-bottom">
-                      <div class="mock-card-meta">
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>2d ago</span>
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>jot</span>
-                      </div>
-                      <div class="mock-card-actions">
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></div>
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v3"/><path d="m15.2 8 .8-3H8l.8 3"/><path d="M8 8 6 17h12l-2-9"/></svg></div>
-                      </div>
+                      <span class="mock-card-source">jot</span>
+                      <span class="mock-card-open">Open</span>
                     </div>
+                    <div class="mock-card-drag-strip"><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span><span class="mock-card-drag-dot"></span></div>
                   </div>
                 </div>
               </div>
+              <!-- Archive column -->
               <div class="mock-column">
                 <div class="mock-col-header">
-                  <div class="mock-col-dot" style="background:var(--text-dim)"></div>
+                  <div class="mock-col-dot" style="background:#b5aea8"></div>
                   <span class="mock-col-title">Archive</span>
                   <span class="mock-col-count">1</span>
                 </div>
                 <div class="mock-col-body">
                   <div class="mock-card dimmed">
                     <div class="mock-card-top">
-                      <div style="display:flex;align-items:center;gap:6px;">
+                      <div class="mock-card-badges">
                         <span class="mock-card-badge inbox">Inbox</span>
                         <span class="mock-card-status archived">Archived</span>
                       </div>
@@ -807,15 +787,10 @@
                     <div class="mock-card-title">Old Project Specs</div>
                     <div class="mock-card-preview">Completed items from Q4 — migration checklist, deprecated API endpoints, legacy auth flow…</div>
                     <div class="mock-card-bottom">
-                      <div class="mock-card-meta">
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>Last week</span>
-                        <span class="mock-card-meta-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 01-8.49-8.49l9.19-9.19a4 4 0 015.66 5.66l-9.2 9.19a2 2 0 01-2.83-2.83l8.49-8.48"/></svg>jot</span>
-                      </div>
-                      <div class="mock-card-actions">
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg></div>
-                        <div class="mock-card-action"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 17v3"/><path d="m15.2 8 .8-3H8l.8 3"/><path d="M8 8 6 17h12l-2-9"/></svg></div>
-                      </div>
+                      <span class="mock-card-source">jot</span>
+                      <span class="mock-card-open">Archived</span>
                     </div>
+                    <div class="mock-card-drag-strip" style="background:#f0ece7"><span class="mock-card-drag-dot" style="background:#c4bdb6"></span><span class="mock-card-drag-dot" style="background:#c4bdb6"></span><span class="mock-card-drag-dot" style="background:#c4bdb6"></span></div>
                   </div>
                 </div>
               </div>
