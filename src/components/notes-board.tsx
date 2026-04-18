@@ -22,7 +22,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { Archive, Bell, ChevronLeft, ChevronRight, MoreHorizontal, Pin, Plus, Trash2, X } from "lucide-react";
+import { Archive, Bell, ChevronLeft, ChevronRight, MoreHorizontal, Pencil, Pin, Plus, Trash2, X } from "lucide-react";
 import { INBOX_NOTEBOOK_ID, STATUS_LABELS } from "../lib/constants";
 import type { BoardView, Notebook, Note } from "../lib/types";
 
@@ -243,6 +243,7 @@ function BoardNoteCardBody({
   onArchiveToggle,
   onPinnedToggle,
   onDelete,
+  onEdit,
 }: {
   note: Note;
   dragStripActive: boolean;
@@ -250,11 +251,22 @@ function BoardNoteCardBody({
   onArchiveToggle?: (note: Note) => void;
   onPinnedToggle?: (note: Note) => void;
   onDelete?: (note: Note) => void;
+  onEdit?: (note: Note) => void;
 }) {
   const pinArchive = (
     <div className="flex items-center gap-1">
       {headerActions === "interactive" ? (
         <>
+          <button
+            type="button"
+            className="rounded-full p-1.5 text-[#b5aea8] transition hover:bg-[#f3efeb] hover:text-[#2d2a27]"
+            onClick={(event) => {
+              event.stopPropagation();
+              onEdit?.(note);
+            }}
+          >
+            <Pencil className="h-3.5 w-3.5" />
+          </button>
           <button
             type="button"
             className={clsx(
@@ -291,6 +303,9 @@ function BoardNoteCardBody({
         </>
       ) : (
         <>
+          <span className="inline-flex rounded-full p-1.5 text-[#b5aea8]" aria-hidden>
+            <Pencil className="h-3.5 w-3.5" />
+          </span>
           <span
             className={clsx(
               "inline-flex rounded-full p-1.5",
@@ -340,12 +355,14 @@ function BoardNoteCardBody({
 function SortableNoteCard({
   note,
   onOpen,
+  onEdit,
   onArchiveToggle,
   onPinnedToggle,
   onDelete,
 }: {
   note: Note;
   onOpen: (note: Note) => void;
+  onEdit: (note: Note) => void;
   onArchiveToggle: (note: Note) => void;
   onPinnedToggle: (note: Note) => void;
   onDelete: (note: Note) => void;
@@ -400,6 +417,7 @@ function SortableNoteCard({
         onArchiveToggle={onArchiveToggle}
         onPinnedToggle={onPinnedToggle}
         onDelete={onDelete}
+        onEdit={onEdit}
       />
     </div>
   );
@@ -1032,6 +1050,7 @@ export function NotesBoard({
   activeNotes,
   archivedNotes,
   onOpenNote,
+  onEditNote,
   onCreateNote,
   onEditNotebook,
   onMoveNote,
@@ -1045,6 +1064,7 @@ export function NotesBoard({
   activeNotes: Note[];
   archivedNotes: Note[];
   onOpenNote: (note: Note) => void;
+  onEditNote: (note: Note) => void;
   onCreateNote: (notebookId: string | null) => void;
   onEditNotebook: (notebook: Notebook) => void;
   onMoveNote: (noteId: string, columnId: string | null) => Promise<void>;
@@ -1221,6 +1241,7 @@ export function NotesBoard({
               key={note.id}
               note={note}
               onOpen={onOpenNote}
+              onEdit={onEditNote}
               onArchiveToggle={onToggleArchived}
               onPinnedToggle={onTogglePinned}
               onDelete={onDeleteNote}
@@ -1255,6 +1276,7 @@ export function NotesBoard({
                     key={note.id}
                     note={note}
                     onOpen={onOpenNote}
+                    onEdit={onEditNote}
                     onArchiveToggle={onToggleArchived}
                     onPinnedToggle={onTogglePinned}
                     onDelete={onDeleteNote}

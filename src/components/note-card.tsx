@@ -9,6 +9,7 @@ import {
   MessageSquare,
   MoreHorizontal,
   Paperclip,
+  Pencil,
   Sparkles,
   Star,
   WandSparkles,
@@ -23,6 +24,7 @@ interface NoteCardProps {
   index: number;
   selected: boolean;
   onSelect: () => void;
+  onEdit: () => void;
   onTogglePinned: () => void;
   onReclassify: () => void;
   onExport: (targetId: string) => void;
@@ -78,6 +80,7 @@ export function NoteCard({
   index,
   selected,
   onSelect,
+  onEdit,
   onTogglePinned,
   onReclassify,
   onExport,
@@ -150,6 +153,17 @@ export function NoteCard({
         </div>
 
         <div className="relative flex shrink-0 items-center gap-2">
+
+          <button
+            type="button"
+            onClick={(event) => {
+              event.stopPropagation();
+              onEdit();
+            }}
+            className="rounded-full p-1.5 text-[#b5aea8] transition hover:bg-[#f3efeb] hover:text-[#2d2a27]"
+          >
+            <Pencil className="h-4 w-4" />
+          </button>
 
           <button
             type="button"

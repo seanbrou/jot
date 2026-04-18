@@ -14,6 +14,7 @@ import { AuthGate } from "./auth-gate";
 import { AccountDialog } from "./account-dialog";
 import { NotebookDialog } from "./notebook-dialog";
 import { NoteDialog, type NoteDialogState } from "./note-dialog";
+import { NoteViewDialog, type NoteViewState } from "./note-view-dialog";
 import { NotesBoard, getColumnIdFromNote } from "./notes-board";
 import {
   AlertDialog,
@@ -77,6 +78,7 @@ export function MainWindow() {
   const [notebookDialogOpen, setNotebookDialogOpen] = useState(false);
   const [editingNotebookId, setEditingNotebookId] = useState<string | null>(null);
   const [noteDialog, setNoteDialog] = useState<NoteDialogState>(EMPTY_NOTE_DIALOG);
+  const [noteView, setNoteView] = useState<NoteViewState>({ open: false, note: null });
   const [deleteTarget, setDeleteTarget] = useState<DeleteTarget>(null);
   const [loadingNoteDetail, setLoadingNoteDetail] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -116,8 +118,12 @@ export function MainWindow() {
     });
   }
 
-  async function openEditNote(note: Note) {
-    if (!isAuthenticated) return;
+  function openViewNote(note: Note) {
+    setNoteView({ open: true, note });
+  }
+
+  async function switchToEditMode(note: Note) {
+    setNoteView({ open: false, note: null });
     setLoadingNoteDetail(true);
     try {
       const detail = await getNoteDetail(note.id);
@@ -395,7 +401,8 @@ export function MainWindow() {
               notebooks={snapshot.notebooks}
               activeNotes={snapshot.activeNotes}
               archivedNotes={snapshot.archivedNotes}
-              onOpenNote={(note) => void openEditNote(note)}
+              onOpenNote={(note) => openViewNote(note)}
+              onEditNote={(note) => switchToEditMode(note)}
               onCreateNote={openCreateNote}
               onEditNotebook={(notebook) => openNotebookEditor(notebook.id)}
               onMoveNote={handleMoveNote}
@@ -421,6 +428,20 @@ export function MainWindow() {
       </div>
 
       {/* ── Dialogs ── */}
+      <NoteViewDialog
+        state={noteView}
+        notebooks={snapshot.notebooks}
+        onOpenChange={(open) => setNoteView((curr) => ({ ...curr, open }))}
+        onEdit={(note) => switchToEditMode(note)}
+        onDelete={(note) => {
+          setNoteView({ open: false, note: null });
+          setDeleteTarget({ type: "note", id: note.id, label: note.suggestedTitle || note.title });
+        }}
+        onTogglePinned={(note) => {
+          void togglePinned(note.id, !note.pinned);
+        }}
+      />
+
       <NoteDialog
         state={noteDialog}
         notebooks={snapshot.notebooks}
