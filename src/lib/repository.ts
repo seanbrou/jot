@@ -28,6 +28,7 @@ interface NoteRow {
   pinned: number;
   archived: number | null;
   suggested_title: string | null;
+  reminder_at: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -66,6 +67,7 @@ function mapNote(row: NoteRow): Note {
     pinned: Boolean(row.pinned),
     archived: Boolean(row.archived),
     suggestedTitle: row.suggested_title,
+    reminderAt: row.reminder_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -160,8 +162,8 @@ export async function createQuickNote(body: string): Promise<Note> {
   const id = crypto.randomUUID();
   const now = new Date().toISOString();
   await db.execute(
-    "INSERT INTO notes (id, notebook_id, body, source, ai_status, ai_confidence, pinned, suggested_title, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)",
-    [id, null, body.trim(), "quick-capture", "pending", null, 0, null, now, now],
+    "INSERT INTO notes (id, notebook_id, body, source, ai_status, ai_confidence, pinned, suggested_title, reminder_at, created_at, updated_at) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)",
+    [id, null, body.trim(), "quick-capture", "pending", null, 0, null, null, now, now],
   );
 
   return {
@@ -175,6 +177,7 @@ export async function createQuickNote(body: string): Promise<Note> {
     pinned: false,
     archived: false,
     suggestedTitle: null,
+    reminderAt: null,
     createdAt: now,
     updatedAt: now,
   };

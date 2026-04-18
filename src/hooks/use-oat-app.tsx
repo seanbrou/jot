@@ -75,6 +75,7 @@ interface OatAppContextValue {
     aiStatus: "pending" | "sorted" | "review" | "failed";
     suggestedTitle: string | null;
     title: string;
+    reminderAt: string | null;
   }>;
   signOut: () => Promise<void>;
 }

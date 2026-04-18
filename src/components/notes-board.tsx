@@ -507,7 +507,6 @@ function CalendarView({
 
   const todayKey = today.toISOString().slice(0, 10);
   const selectedDayNotes = selectedDay ? dayMap.get(selectedDay) ?? [] : [];
-  const selectedDayReminders = futureReminderMap.get(selectedDay) ?? [];
 
   const monthLabel = currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" });
 

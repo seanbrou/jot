@@ -112,6 +112,7 @@ export function MainWindow() {
       body: "",
       notebookId,
       useAiRouting: true,
+      reminderAt: null,
     });
   }
 
@@ -126,6 +127,7 @@ export function MainWindow() {
         body: detail.body,
         notebookId: detail.notebookId,
         useAiRouting: detail.notebookId === null && !detail.archived,
+        reminderAt: detail.reminderAt ?? null,
       });
     } catch {
       // noop

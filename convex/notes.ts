@@ -999,6 +999,7 @@ export const getDetail = queryGeneric({
       aiStatus: note.aiStatus,
       suggestedTitle: note.suggestedTitle,
       title: note.title,
+      reminderAt: note.reminderAt ? new Date(note.reminderAt).toISOString() : null,
     };
   },
 });
