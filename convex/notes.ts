@@ -18,9 +18,9 @@ import {
   buildBodyPreview,
 } from "./lib";
 
-const classifierModel = process.env.OAT_CLASSIFIER_MODEL ?? "google/gemini-2.5-flash-lite";
+const classifierModel = process.env.OAT_CLASSIFIER_MODEL ?? "qwen/qwen-plus";
 const titleModel =
-  process.env.OAT_NOTE_TITLE_MODEL ?? "google/gemini-3.1-flash-lite-preview";
+  process.env.OAT_NOTE_TITLE_MODEL ?? "qwen/qwen-plus";
 
 const classificationSchema = z.object({
   notebookId: z.string().nullable(),

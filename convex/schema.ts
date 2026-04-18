@@ -49,7 +49,7 @@ export default defineSchema({
     pinned: v.boolean(),
     archived: v.boolean(),
     suggestedTitle: v.union(v.string(), v.null()),
-    reminderAt: v.union(v.number(), v.null()),
+    reminderAt: v.optional(v.union(v.number(), v.null())),
     createdAt: v.number(),
     updatedAt: v.number(),
   })

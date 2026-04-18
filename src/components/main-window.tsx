@@ -2,13 +2,13 @@ import { useState } from "react";
 import clsx from "clsx";
 import {
   Archive,
+  Calendar,
   LayoutGrid,
   Loader2,
   NotebookPen,
   Plus,
   Search,
   Sparkles,
-  ListOrdered,
 } from "lucide-react";
 import { AuthGate } from "./auth-gate";
 import { AccountDialog } from "./account-dialog";
@@ -192,7 +192,7 @@ export function MainWindow() {
 
   const navItems = [
     { id: "board" as BoardView, label: "Board", icon: LayoutGrid },
-    { id: "timeline" as BoardView, label: "Timeline", icon: ListOrdered },
+    { id: "timeline" as BoardView, label: "Calendar", icon: Calendar },
     { id: "archive" as BoardView, label: "Archive", icon: Archive },
   ];
 
