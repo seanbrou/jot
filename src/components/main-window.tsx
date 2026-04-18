@@ -41,6 +41,7 @@ const EMPTY_NOTE_DIALOG: NoteDialogState = {
   body: "",
   notebookId: null,
   useAiRouting: true,
+  reminderAt: null,
 };
 
 export function MainWindow() {
@@ -160,9 +161,13 @@ export function MainWindow() {
         reclassify: noteDialog.useAiRouting,
       });
     } else {
+      const reminderTimestamp = noteDialog.reminderAt
+        ? new Date(noteDialog.reminderAt).getTime()
+        : null;
       await createNote({
         body: trimmed,
         notebookId: noteDialog.useAiRouting ? null : noteDialog.notebookId,
+        reminderAt: reminderTimestamp,
       });
     }
     setNoteDialog(EMPTY_NOTE_DIALOG);
@@ -332,7 +337,7 @@ export function MainWindow() {
               onClick={() => openCreateNote(null)}
             >
               <Plus className="h-4 w-4" strokeWidth={2.5} />
-              New note
+              New
             </button>
           </div>
         </header>
@@ -356,10 +361,10 @@ export function MainWindow() {
           {activeView === "timeline" && (
             <div className="mb-4">
               <h2 className="text-lg font-semibold tracking-tight text-[#2d2a27]">
-                Timeline
+                Calendar
               </h2>
               <p className="mt-0.5 text-[13px] text-[#8c857f]">
-                All your notes, organized by day.
+                Your notes and reminders, organized by day.
               </p>
             </div>
           )}

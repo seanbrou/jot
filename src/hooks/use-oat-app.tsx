@@ -59,6 +59,7 @@ interface OatAppContextValue {
     notebookId: string | null;
     source?: string;
     pinned?: boolean;
+    reminderAt?: number | null;
   }) => Promise<void>;
   deleteNote: (noteId: string) => Promise<void>;
   moveNote: (noteId: string, notebookId: string | null) => Promise<void>;
@@ -423,7 +424,7 @@ export function OatAppProvider({
         true,
       );
     },
-    createNote: async ({ body, notebookId, source = "main-window", pinned = false }) => {
+    createNote: async ({ body, notebookId, source = "main-window", pinned = false, reminderAt }) => {
       const trimmed = body.trim();
       if (!trimmed) {
         setError("Notes need at least a little text.");
@@ -436,6 +437,7 @@ export function OatAppProvider({
             body: trimmed,
             source,
             pinned,
+            reminderAt: reminderAt ?? null,
           });
           return;
         }
@@ -445,6 +447,7 @@ export function OatAppProvider({
           notebookId: notebookId as never,
           source,
           pinned,
+          reminderAt: reminderAt ?? null,
         });
       });
     },

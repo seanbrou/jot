@@ -49,12 +49,14 @@ export default defineSchema({
     pinned: v.boolean(),
     archived: v.boolean(),
     suggestedTitle: v.union(v.string(), v.null()),
+    reminderAt: v.union(v.number(), v.null()),
     createdAt: v.number(),
     updatedAt: v.number(),
   })
     .index("by_authUserId_updatedAt", ["authUserId", "updatedAt"])
     .index("by_authUserId_archived_updatedAt", ["authUserId", "archived", "updatedAt"])
     .index("by_authUserId_notebookId_updatedAt", ["authUserId", "notebookId", "updatedAt"])
+    .index("by_authUserId_reminderAt", ["authUserId", "reminderAt"])
     .searchIndex("search_text", {
       searchField: "searchText",
       filterFields: ["authUserId", "archived"],

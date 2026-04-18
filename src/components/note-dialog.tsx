@@ -1,4 +1,4 @@
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Bell } from "lucide-react";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -27,6 +27,7 @@ export type NoteDialogState = {
   body: string;
   notebookId: string | null;
   useAiRouting: boolean;
+  reminderAt: string | null;
 };
 
 export function NoteDialog({
@@ -127,6 +128,46 @@ export function NoteDialog({
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+          )}
+
+          {/* Reminder section — create mode only */}
+          {isCreate && (
+            <div className="flex items-center justify-between rounded-lg border border-[#f0ece8] bg-[#faf7f5] px-4 py-3">
+              <div className="flex items-center gap-2.5">
+                <Bell className="h-4 w-4 text-[#b35c2a]" />
+                <div>
+                  <div className="text-[13px] font-medium text-[#2d2a27]">Set reminder</div>
+                  <div className="text-[11px] text-[#8c857f]">
+                    {state.reminderAt
+                      ? new Date(state.reminderAt).toLocaleString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })
+                      : "Get reminded about this note"}
+                  </div>
+                </div>
+              </div>
+              <input
+                type="datetime-local"
+                className="rounded-md border border-[#e0d9d2] bg-white px-2 py-1 text-[12px] text-[#2d2a27] outline-none focus:border-[#b35c2a]"
+                value={state.reminderAt
+                  ? (() => {
+                      const d = new Date(state.reminderAt);
+                      const offset = d.getTimezoneOffset();
+                      const local = new Date(d.getTime() - offset * 60000);
+                      return local.toISOString().slice(0, 16);
+                    })()
+                  : ""}
+                onChange={(e) =>
+                  onStateChange({
+                    ...state,
+                    reminderAt: e.target.value ? new Date(e.target.value).toISOString() : null,
+                  })
+                }
+              />
             </div>
           )}
         </div>

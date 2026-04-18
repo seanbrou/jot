@@ -84,6 +84,7 @@ function normalizeNote(note: {
   pinned: boolean;
   archived: boolean;
   suggestedTitle: string | null;
+  reminderAt: number | null;
   createdAt: number;
   updatedAt: number;
 }) {
@@ -98,6 +99,7 @@ function normalizeNote(note: {
     pinned: note.pinned,
     archived: note.archived,
     suggestedTitle: note.suggestedTitle,
+    reminderAt: note.reminderAt ? new Date(note.reminderAt).toISOString() : null,
     createdAt: new Date(note.createdAt).toISOString(),
     updatedAt: new Date(note.updatedAt).toISOString(),
   };
@@ -411,6 +413,7 @@ export const create = mutationGeneric({
     source: v.string(),
     notebookId: v.optional(v.union(v.id("notebooks"), v.null())),
     pinned: v.optional(v.boolean()),
+    reminderAt: v.optional(v.union(v.number(), v.null())),
   },
   handler: async (ctx, args) => {
     const authUser = await requireAuthUser(ctx);
@@ -437,6 +440,7 @@ export const create = mutationGeneric({
       pinned: args.pinned ?? false,
       archived: false,
       suggestedTitle: null,
+      reminderAt: args.reminderAt ?? null,
       createdAt: now,
       updatedAt: now,
     });
@@ -457,6 +461,7 @@ export const createPendingNote = internalMutationGeneric({
     body: v.string(),
     source: v.string(),
     pinned: v.optional(v.boolean()),
+    reminderAt: v.optional(v.union(v.number(), v.null())),
   },
   handler: async (ctx, args) => {
     const body = args.body.trim();
@@ -478,6 +483,7 @@ export const createPendingNote = internalMutationGeneric({
       pinned: args.pinned ?? false,
       archived: false,
       suggestedTitle: null,
+      reminderAt: args.reminderAt ?? null,
       createdAt: now,
       updatedAt: now,
     });
@@ -491,6 +497,7 @@ export const createAndClassify = actionGeneric({
     body: v.string(),
     source: v.string(),
     pinned: v.optional(v.boolean()),
+    reminderAt: v.optional(v.union(v.number(), v.null())),
   },
   handler: async (ctx, args) => {
     const authUser = await requireAuthUser(ctx as never);
@@ -499,6 +506,7 @@ export const createAndClassify = actionGeneric({
       body: args.body,
       source: args.source,
       pinned: args.pinned ?? false,
+      reminderAt: args.reminderAt ?? null,
     });
 
     if (!note) {

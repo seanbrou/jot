@@ -20,6 +20,7 @@ export interface Note {
   aiConfidence: number | null;
   pinned: boolean;
   archived: boolean;
+  reminderAt: string | null;
   suggestedTitle: string | null;
   createdAt: string;
   updatedAt: string;

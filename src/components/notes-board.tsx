@@ -22,7 +22,7 @@ import {
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import clsx from "clsx";
-import { Archive, MoreHorizontal, Pin, Plus, Trash2 } from "lucide-react";
+import { Archive, Bell, ChevronLeft, ChevronRight, MoreHorizontal, Pin, Plus, Trash2, X } from "lucide-react";
 import { INBOX_NOTEBOOK_ID, STATUS_LABELS } from "../lib/constants";
 import type { BoardView, Notebook, Note } from "../lib/types";
 
@@ -421,118 +421,288 @@ function OverlayCard({ note }: { note: Note }) {
   );
 }
 
-function TimelineView({
+function CalendarView({
   notes,
   onOpen,
 }: {
   notes: Note[];
   onOpen: (note: Note) => void;
 }) {
-  if (notes.length === 0) {
-    return (
-      <div className="flex h-[calc(100vh-14rem)] items-center justify-center text-sm text-[#8c857f]">
-        No notes yet. Create one to get started.
-      </div>
-    );
-  }
+  const today = new Date();
+  const [currentMonth, setCurrentMonth] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [selectedDay, setSelectedDay] = useState<string | null>(null);
 
-  // Group by date
-  const grouped = new Map<string, Note[]>();
-  for (const note of notes) {
-    const date = new Date(note.updatedAt);
-    const key = date.toLocaleDateString("en-US", {
-      weekday: "long",
-      month: "long",
-      day: "numeric",
-    });
-    if (!grouped.has(key)) grouped.set(key, []);
-    grouped.get(key)!.push(note);
-  }
+  // Build day -> notes map
+  const dayMap = useMemo(() => {
+    const map = new Map<string, Note[]>();
+    for (const note of notes) {
+      // Index by createdAt date for existing notes
+      const createdDate = new Date(note.createdAt);
+      const key = createdDate.toISOString().slice(0, 10);
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(note);
+
+      // Also index by reminderAt for future reminders
+      if (note.reminderAt) {
+        const reminderDate = new Date(note.reminderAt);
+        const reminderKey = reminderDate.toISOString().slice(0, 10);
+        if (!map.has(reminderKey)) map.set(reminderKey, []);
+        // Avoid duplicating if reminder is same day as creation
+        if (reminderKey !== key) {
+          map.get(reminderKey)!.push(note);
+        }
+      }
+    }
+    return map;
+  }, [notes]);
+
+  // Build future-only reminders map for highlighting
+  const futureReminderMap = useMemo(() => {
+    const map = new Map<string, Note[]>();
+    const todayKey = today.toISOString().slice(0, 10);
+    for (const note of notes) {
+      if (note.reminderAt) {
+        const reminderDate = new Date(note.reminderAt);
+        const reminderKey = reminderDate.toISOString().slice(0, 10);
+        if (reminderKey >= todayKey) {
+          if (!map.has(reminderKey)) map.set(reminderKey, []);
+          map.get(reminderKey)!.push(note);
+        }
+      }
+    }
+    return map;
+  }, [notes]);
+
+  // Generate calendar grid
+  const calendarDays = useMemo(() => {
+    const year = currentMonth.getFullYear();
+    const month = currentMonth.getMonth();
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+    const startDay = firstDay.getDay(); // 0=Sun
+
+    const days: { date: Date; isCurrentMonth: boolean; key: string }[] = [];
+
+    // Previous month padding
+    for (let i = startDay - 1; i >= 0; i--) {
+      const d = new Date(year, month, -i);
+      days.push({ date: d, isCurrentMonth: false, key: d.toISOString().slice(0, 10) });
+    }
+
+    // Current month
+    for (let i = 1; i <= lastDay.getDate(); i++) {
+      const d = new Date(year, month, i);
+      days.push({ date: d, isCurrentMonth: true, key: d.toISOString().slice(0, 10) });
+    }
+
+    // Next month padding to fill 6 rows (42 cells)
+    const remaining = 42 - days.length;
+    for (let i = 1; i <= remaining; i++) {
+      const d = new Date(year, month + 1, i);
+      days.push({ date: d, isCurrentMonth: false, key: d.toISOString().slice(0, 10) });
+    }
+
+    return days;
+  }, [currentMonth]);
+
+  const todayKey = today.toISOString().slice(0, 10);
+  const selectedDayNotes = selectedDay ? dayMap.get(selectedDay) ?? [] : [];
+  const selectedDayReminders = futureReminderMap.get(selectedDay) ?? [];
+
+  const monthLabel = currentMonth.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+
+  const weekDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
   return (
     <div className="custom-scrollbar flex h-[calc(100vh-14rem)] flex-col overflow-y-auto overscroll-y-contain pr-1">
-      {Array.from(grouped.entries()).map(([dateLabel, dayNotes], groupIdx) => (
-        <div key={dateLabel} className={clsx(groupIdx > 0 && "mt-8")}>
-          {/* Date header */}
-          <div className="sticky top-0 z-10 mb-4 bg-[#faf7f5] pb-2 pt-1">
-            <div className="flex items-center gap-3">
-              <span className="text-[13px] font-semibold text-[#2d2a27]">
-                {dateLabel}
-              </span>
-              <span className="h-px flex-1 bg-[#ece4dc]" />
-              <span className="text-[11px] font-medium text-[#b5aea8]">
-                {dayNotes.length} {dayNotes.length === 1 ? "note" : "notes"}
-              </span>
-            </div>
+      {/* Month navigation */}
+      <div className="mb-4 flex items-center justify-between">
+        <button
+          type="button"
+          className="rounded-lg p-2 text-[#8c857f] transition-colors hover:bg-[#f7f4f0] hover:text-[#b35c2a]"
+          onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1))}
+        >
+          <ChevronLeft className="h-5 w-5" />
+        </button>
+        <h3 className="text-[15px] font-semibold text-[#2d2a27]">{monthLabel}</h3>
+        <button
+          type="button"
+          className="rounded-lg p-2 text-[#8c857f] transition-colors hover:bg-[#f7f4f0] hover:text-[#b35c2a]"
+          onClick={() => setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1))}
+        >
+          <ChevronRight className="h-5 w-5" />
+        </button>
+      </div>
+
+      {/* Week day headers */}
+      <div className="mb-2 grid grid-cols-7 gap-1">
+        {weekDays.map((day) => (
+          <div key={day} className="py-1 text-center text-[10px] font-semibold uppercase tracking-wider text-[#b5aea8]">
+            {day}
           </div>
+        ))}
+      </div>
 
-          {/* Notes list */}
-          <div className="flex flex-col">
-            {dayNotes.map((note, idx) => {
-              const statusLabel = STATUS_LABELS[note.aiStatus];
-              const time = new Date(note.updatedAt).toLocaleTimeString("en-US", {
-                hour: "numeric",
-                minute: "2-digit",
-              });
-              return (
-                <button
-                  key={note.id}
-                  type="button"
-                  className={clsx(
-                    "group flex items-start gap-4 py-3 text-left transition-colors hover:bg-[#f7f4f0]/60 rounded-lg px-3 -mx-3",
-                    idx < dayNotes.length - 1 && "border-b border-[#ece4dc]/50",
-                  )}
-                  onClick={() => onOpen(note)}
-                >
-                  {/* Time + status column */}
-                  <div className="flex w-20 shrink-0 flex-col items-end gap-1 pt-0.5">
-                    <span className="text-[12px] font-medium text-[#8c857f] tabular-nums">
-                      {time}
-                    </span>
-                    <span
-                      className={clsx(
-                        "rounded-full px-1.5 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em]",
-                        note.archived
-                          ? "bg-[#f3efeb] text-[#8c857f]"
-                          : note.aiStatus === "sorted"
-                          ? "bg-[#b35c2a]/10 text-[#b35c2a]"
-                          : note.aiStatus === "pending"
-                          ? "bg-[#f3efeb] text-[#8c857f]"
-                          : note.aiStatus === "review"
-                          ? "bg-[#efe6da] text-[#7a5c40]"
-                          : "bg-[#ffdad6] text-[#93000a]",
-                      )}
-                    >
-                      {note.archived ? "Archived" : statusLabel}
-                    </span>
-                  </div>
+      {/* Calendar grid */}
+      <div className="grid grid-cols-7 gap-1">
+        {calendarDays.map(({ date, isCurrentMonth, key }) => {
+          const dayNotes = dayMap.get(key) ?? [];
+          const hasReminder = futureReminderMap.has(key);
+          const isToday = key === todayKey;
+          const isSelected = key === selectedDay;
+          const hasPinned = dayNotes.some((n) => n.pinned);
 
-                  {/* Content column */}
-                  <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-semibold leading-snug text-[#2d2a27] group-hover:text-[#b35c2a] transition-colors">
-                      {note.suggestedTitle || note.title}
-                    </div>
-                    <div className="mt-0.5 line-clamp-2 text-[12px] leading-5 text-[#8c857f]">
-                      {note.body}
-                    </div>
-                    <div className="mt-1.5 text-[10px] font-medium uppercase tracking-[0.06em] text-[#b5aea8]">
-                      {note.source.replace(/-/g, " ")}
-                    </div>
-                  </div>
+          return (
+            <button
+              key={key}
+              type="button"
+              className={clsx(
+                "relative flex min-h-[56px] flex-col items-start justify-start rounded-lg border p-1.5 text-left transition-all",
+                isCurrentMonth ? "bg-white border-[#e8e2dc]/60" : "bg-[#f7f4f0]/40 border-transparent text-[#c4bdb6]",
+                isToday && "border-[#b35c2a]/40 bg-[#b35c2a]/5",
+                isSelected && "ring-2 ring-[#b35c2a] border-[#b35c2a]",
+                dayNotes.length > 0 && "hover:border-[#b35c2a]/30",
+              )}
+              onClick={() => setSelectedDay(isSelected ? null : key)}
+            >
+              <span className={clsx(
+                "text-[12px] font-medium",
+                isToday ? "text-[#b35c2a] font-bold" : isCurrentMonth ? "text-[#2d2a27]" : "text-[#d4cec8]",
+              )}>
+                {date.getDate()}
+              </span>
 
-                  {/* Arrow indicator */}
-                  <div className="mt-1 shrink-0 text-[#d4cec8] opacity-0 transition-opacity group-hover:opacity-100">
-                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </button>
-              );
-            })}
-          </div>
+              {/* Indicator dots */}
+              <div className="mt-auto flex flex-wrap gap-0.5 pt-0.5">
+                {hasPinned && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#b35c2a]" />
+                )}
+                {hasReminder && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#6b8e6b]" />
+                )}
+                {dayNotes.length > 2 && !hasPinned && (
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#b5aea8]" />
+                )}
+              </div>
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Legend */}
+      <div className="mt-4 flex items-center gap-4 text-[11px] text-[#8c857f]">
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-[#b35c2a]" />
+          Pinned
         </div>
-      ))}
+        <div className="flex items-center gap-1.5">
+          <span className="h-2 w-2 rounded-full bg-[#6b8e6b]" />
+          Reminder
+        </div>
+      </div>
+
+      {/* Day detail popup */}
+      {selectedDay && (
+        <DayPopup
+          dateKey={selectedDay}
+          notes={selectedDayNotes}
+          onOpen={onOpen}
+          onClose={() => setSelectedDay(null)}
+        />
+      )}
     </div>
+  );
+}
+
+function DayPopup({
+  dateKey,
+  notes,
+  onOpen,
+  onClose,
+}: {
+  dateKey: string;
+  notes: Note[];
+  onOpen: (note: Note) => void;
+  onClose: () => void;
+}) {
+  const displayDate = new Date(dateKey + "T12:00:00");
+  const dateLabel = displayDate.toLocaleDateString("en-US", {
+    weekday: "long",
+    month: "long",
+    day: "numeric",
+  });
+
+  return createPortal(
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="mx-4 w-full max-w-md overflow-hidden rounded-2xl border border-[#e8e2dc] bg-white shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-[#f0ece8] px-5 py-4">
+          <div>
+            <h3 className="text-[15px] font-semibold text-[#2d2a27]">{dateLabel}</h3>
+            <p className="text-[12px] text-[#8c857f]">
+              {notes.length} {notes.length === 1 ? "note" : "notes"}
+            </p>
+          </div>
+          <button
+            type="button"
+            className="rounded-lg p-1.5 text-[#b5aea8] transition-colors hover:bg-[#f7f4f0] hover:text-[#2d2a27]"
+            onClick={onClose}
+          >
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        {/* Notes list */}
+        <div className="custom-scrollbar max-h-[60vh] overflow-y-auto px-5 py-3">
+          {notes.length === 0 ? (
+            <p className="py-6 text-center text-sm text-[#b5aea8]">Nothing on this day.</p>
+          ) : (
+            <div className="space-y-2">
+              {notes.map((note) => {
+                const hasReminder = note.reminderAt && new Date(note.reminderAt).toISOString().slice(0, 10) === dateKey;
+                return (
+                  <button
+                    key={`${note.id}-${hasReminder ? "reminder" : "note"}`}
+                    type="button"
+                    className="w-full rounded-xl border border-[#e8e2dc]/60 bg-[#faf7f5] p-3 text-left transition-all hover:border-[#b35c2a]/30 hover:shadow-sm"
+                    onClick={() => {
+                      onClose();
+                      onOpen(note);
+                    }}
+                  >
+                    <div className="mb-1 flex items-center gap-2">
+                      {note.pinned && <Pin className="h-3 w-3 text-[#b35c2a]" />}
+                      {hasReminder && <Bell className="h-3 w-3 text-[#6b8e6b]" />}
+                      <span className="text-[12px] font-semibold text-[#2d2a27]">
+                        {note.suggestedTitle || note.title}
+                      </span>
+                    </div>
+                    <p className="line-clamp-2 text-[11px] leading-5 text-[#8c857f]">
+                      {note.body}
+                    </p>
+                    {hasReminder && note.reminderAt && (
+                      <p className="mt-1 text-[10px] text-[#6b8e6b]">
+                        Reminder at {new Date(note.reminderAt).toLocaleTimeString("en-US", {
+                          hour: "numeric",
+                          minute: "2-digit",
+                        })}
+                      </p>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -772,7 +942,7 @@ export function NotesBoard({
   }, [activeNotes, archivedNotes]);
 
   if (activeView === "timeline") {
-    return <TimelineView notes={activeNotes} onOpen={onOpenNote} />;
+    return <CalendarView notes={activeNotes} onOpen={onOpenNote} />;
   }
 
   if (activeView === "archive") {
